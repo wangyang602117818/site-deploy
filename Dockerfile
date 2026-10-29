@@ -8,7 +8,6 @@ COPY . ./
 # 2. 【请检查并修改】将这里的路径换成你真正的 Web 启动项目的 .csproj 相对路径
 # 比如你的主程序在 src/SiteDeploy/SiteDeploy.csproj，就改成对应的路径
 # 如果你的 csproj 文件直接在根目录，就写文件名即可
-RUN dotnet restore "SiteDeploy.Document/SiteDeploy.Document.csproj"
 RUN dotnet publish "SiteDeploy.Document/SiteDeploy.Document.csproj" -c Release -o /app/publish --no-self-contained
 
 # -------------------- 阶段2：运行时 Runtime --------------------
