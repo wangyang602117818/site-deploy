@@ -61,3 +61,4 @@ C:\projects\z-my\SiteDeploy.Document\obj\Debug\net8.0\staticwebassets.build.endp
 C:\projects\z-my\SiteDeploy.Document\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\projects\z-my\SiteDeploy.Document\obj\Debug\net8.0\SiteDeploy.Document.genruntimeconfig.cache
 C:\projects\z-my\SiteDeploy.Document\obj\Debug\net8.0\ref\SiteDeploy.Document.dll
+C:\projects\z-my\SiteDeploy.Document\obj\Debug\net8.0\SiteDeploy.Document.sourcelink.json
