@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "SiteDeploy.Document/1.0.0": {
+        "runtime": {
+          "SiteDeploy.Document.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SiteDeploy.Document/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,476 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteDeploy - IIS Site Publishing Management System</title>
+    <!-- 引入外部 CSS 样式文件 -->
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- 顶部导航栏（包含语言切换等全局操作，与主体顶层对齐） -->
+    <header class="global-header">
+        <div class="header-container">
+            <div class="header-brand">🚀 SiteDeploy</div>
+            <div class="lang-bar">
+                <button class="lang-btn active" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="zh">简体中文</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 整体文档布局容器（控制两侧对齐与 60% 宽度核心） -->
+    <div class="doc-layout-container">
+
+        <!-- 左侧菜单栏（默认显示，与右侧顶部对齐） -->
+        <aside class="sidebar">
+            <!-- 英文侧边导航 -->
+            <nav class="sidebar-nav lang-en show">
+                <ul>
+                    <li><a href="#features">✨ Features</a></li>
+                    <li>
+                        <a href="#install">🛠️ Installation & Configuration</a>
+                        <ul class="sub-menu">
+                            <li><a href="#install-single">1. Single Server</a></li>
+                            <li><a href="#install-multi">2. Multi-Server</a></li>
+                            <li><a href="#install-proxy">3. Reverse Proxy</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#usage">💡 Usage Guide</a>
+                        <ul class="sub-menu">
+                            <li><a href="#login">System Login</a></li>
+                            <li><a href="#perm">Permissions</a></li>
+                            <li><a href="#cases">Use Cases</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 中文侧边导航 -->
+            <nav class="sidebar-nav lang-zh">
+                <ul>
+                    <li><a href="#zh-features">✨ 功能特性</a></li>
+                    <li>
+                        <a href="#zh-install">🛠️ 安装与配置</a>
+                        <ul class="sub-menu">
+                            <li><a href="#zh-single">1. 单服务器部署</a></li>
+                            <li><a href="#zh-multi">2. 多服务器部署</a></li>
+                            <li><a href="#zh-proxy">3. 反向代理配置</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#zh-usage">💡 使用指南</a>
+                        <ul class="sub-menu">
+                            <li><a href="#zh-login">系统登录</a></li>
+                            <li><a href="#zh-perm">权限管理</a></li>
+                            <li><a href="#zh-cases">使用案例</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 右侧文档本体（占约 60% 宽度） -->
+        <main class="main-content">
+            <div class="content-card">
+                <!-- 英文内容 -->
+                <div class="lang-en show">
+                    <h1>🚀 IIS Site Publishing Management System (SiteDeploy)</h1>
+                    <blockquote>
+                        <strong>Summary</strong>: An efficient operations and maintenance tool supporting automated IIS site publishing, multi‑server cluster unified deployment, one‑click automatic backup, and version rollback.
+                    </blockquote>
+
+                    <h2 id="features">✨ Features</h2>
+                    <ul>
+                        <li><strong>🌍 Multi‑language Support</strong>: Natively supports switching between Simplified Chinese and English to seamlessly fit different teams.</li>
+                        <li><strong>📦 Core Publishing</strong>: One‑click packaging, uploading, overwriting, and restarting of IIS sites.</li>
+                        <li><strong>🌐 Multi‑machine Coordination</strong>: Supports unified management and distributed deployment for single‑server or multi‑server clusters.</li>
+                        <li><strong>🛡️ Security Guarantee</strong>: Built‑in automated backup and rapid version rollback mechanisms, allowing second‑level rollback if publishing fails.</li>
+                    </ul>
+                    <p><img src="./images/pub_1.gif" alt="Publishing Demo"></p>
+
+                    <h2 id="install">🛠️ Installation & Configuration</h2>
+                    <h3 id="install-single">1. Single Server Deployment (IIS Mode)</h3>
+                    <ol>
+                        <li><strong>Download & Extract</strong>: Download the master node installation package <code>SiteDeploy.zip</code> and extract it to <code>C:\inetpub\wwwroot\SiteDeploy</code>.</li>
+                        <li>
+                            <strong>Configure Application Pool</strong>:
+                            <ul>
+                                <li>Name: <code>sitedeploy</code></li>
+                                <li>.NET CLR Version: <code>No Managed Code</code></li>
+                                <li>Managed Pipeline Mode: <code>Integrated</code></li>
+                                <li>Advanced Settings: Change <strong>Identity</strong> from <code>ApplicationPoolIdentity</code> to <strong><code>LocalSystem</code></strong>.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Add Website</strong>:
+                            <ul>
+                                <li>Site name: <code>SiteDeploy</code></li>
+                                <li>Application pool: Select <code>sitedeploy</code></li>
+                                <li>Physical path: <code>C:\inetpub\wwwroot\SiteDeploy</code></li>
+                                <li>Port number: Custom (e.g., <code>8080</code>)</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Access & Initialization</strong>:
+                            <ul>
+                                <li>Access URL: <code>http://localhost:8080</code></li>
+                                <li>
+                                    <strong>Login Credentials</strong>:
+                                    <ul>
+                                        <li>Username: <code>admin</code></li>
+                                        <li>Initial Password: Check the <code>admin_initial_password.txt</code> file in the site root directory.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Configuration File Description (<code>appsettings.json</code>)</strong>:
+                            <ul>
+                                <li><code>SystemConfig.Urls</code>: Configures the URL addresses of slave nodes.</li>
+                                <li><code>SystemConfig.IpWhitelist</code>: IP whitelist to restrict access.</li>
+                                <li><code>BindUrl</code>: The URL address bound to the current site (required if configured as a Windows service; can be ignored for IIS sites).</li>
+                                <li><code>BasePath</code>: The base path of the site.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="install-multi">2. Multi‑Server Deployment (IIS Mode)</h3>
+                    <blockquote><strong>Prerequisite</strong>: Please ensure that the master node has been successfully deployed and is running.</blockquote>
+                    <ol>
+                        <li><strong>Download & Extract</strong>: Download the slave node installation package <code>SiteDeploy.Node.zip</code> and extract it to <code>C:\inetpub\wwwroot\SiteDeploy.Node</code>.</li>
+                        <li>
+                            <strong>Configure Application Pool</strong>:
+                            <ul>
+                                <li>Name: <code>sitedeploy.node</code></li>
+                                <li>.NET CLR Version: <code>No Managed Code</code></li>
+                                <li>Managed Pipeline Mode: <code>Integrated</code></li>
+                                <li>Advanced Settings: Change <strong>Identity</strong> from <code>ApplicationPoolIdentity</code> to <strong><code>LocalSystem</code></strong>.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Add Website</strong>:
+                            <ul>
+                                <li>Site name: <code>SiteDeploy.Node</code></li>
+                                <li>Application pool: Select <code>sitedeploy.node</code></li>
+                                <li>Physical path: <code>C:\inetpub\wwwroot\SiteDeploy.Node</code></li>
+                                <li>Port number: Custom (e.g., <code>8081</code>)</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Verify Slave Node</strong>:
+                            <p>Visit <code>http://localhost:8081</code>. If the page properly displays the current site's URL, the configuration is successful (slave nodes do not require login).</p>
+                            <p><strong>Configuration File Description (<code>appsettings.json</code>)</strong>:</p>
+                            <ul>
+                                <li><code>SystemConfig.IpWhitelist</code>: IP whitelist restrictions.</li>
+                                <li><code>BindUrl</code>: Binding address for Windows service mode (can be ignored for IIS mode).</li>
+                                <li><code>BasePath</code>: Site base path.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Associate Master Node</strong>:
+                            <p>In the master node's configuration file (<code>appsettings.json</code>), add the slave node URL to <code>SystemConfig.Urls</code> (e.g., <code>http://localhost:8081</code>).</p>
+                        </li>
+                    </ol>
+
+                    <h3 id="install-proxy">3. Reverse Proxy Configuration (High‑Security Environment)</h3>
+                    <blockquote><strong>Applicable Scenario</strong>: In high‑security environments where it is inconvenient to switch the application pool identity to <code>LocalSystem</code>, you can run it via a reverse proxy.</blockquote>
+                    <ol>
+                        <li>
+                            <strong>Modify Configuration File (<code>appsettings.json</code>)</strong>:
+                            <ul>
+                                <li>Set the reverse proxy address <code>BindUrl</code> (e.g., <code>http://127.0.0.1:5002</code>).</li>
+                                <li>Set the site base path <code>BasePath</code> (e.g., <code>sitedeploy</code>).</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Install and Start Windows Service</strong>:
+                            <p>Run the <code>install‑service.bat</code> script in the root directory as an administrator.</p>
+                            <p>Ensure the browser can successfully access <code>http://127.0.0.1:5002/sitedeploy</code>.</p>
+                        </li>
+                        <li>
+                            <strong>Configure IIS Reverse Proxy</strong>:
+                            <p>Ensure IIS has the reverse proxy modules installed (<strong>URL Rewrite</strong> + <strong>Application Request Routing (ARR)</strong>).</p>
+                            <p>Create an empty directory: <code>C:\inetpub\wwwroot\SiteDeploy‑Proxy</code>.</p>
+                            <p>Add a new website in IIS, bind a port (e.g., <code>8080</code>), and point the physical path to the proxy directory created above.</p>
+                            <p>Replace the site's <code>web.config</code> file content:</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+  &lt;system.webServer&gt;
+    &lt;rewrite&gt;
+      &lt;rules&gt;
+        &lt;rule name="ReverseProxyInboundRule1" stopProcessing="true"&gt;
+          &lt;match url="(.*)" /&gt;
+          &lt;action type="Rewrite" url="http://127.0.0.1:5002/sitedeploy/{R:1}" /&gt;
+        &lt;/rule&gt;
+      &lt;/rules&gt;
+    &lt;/rewrite&gt;
+  &lt;/system.webServer&gt;
+&lt;/configuration&gt;</code></pre>
+                        </li>
+                        <li><strong>Access the System</strong>: Visit <code>http://localhost:8080</code> in your browser to use the system.</li>
+                    </ol>
+
+                    <h2 id="usage">💡 Usage Guide</h2>
+                    <h3 id="login">System Login</h3>
+                    <blockquote>⚠️ <strong>Note</strong>: Login is handled uniformly on the master node; slave nodes do not provide a login interface.</blockquote>
+                    <ul>
+                        <li><strong>Default Account</strong>: <code>admin</code></li>
+                        <li><strong>Default Password</strong>: Found in the <code>admin_initial_password.txt</code> file located in the site root directory.</li>
+                    </ul>
+
+                    <h3 id="perm">Permission Management</h3>
+                    <p>After logging in, the administrator can create sub‑users and configure fine‑grained permissions, specifying which servers and specific sites each user can operate.</p>
+                    <p><strong>Configuration Example</strong>: Allowing <code>user1</code> to operate <code>http://localhost:5000</code> (crm‑01, crm‑02 sites) and <code>http://localhost:5001</code> (app01, crm‑01, crm‑02 sites).</p>
+                    <p><img src="./images/per_1.gif" alt="Permission Management Configuration"></p>
+
+                    <h3 id="cases">Use Cases</h3>
+                    <ul>
+                        <li>
+                            <strong>Single Site Publishing</strong>
+                            <p><img src="./images/pub_2.gif" alt="Single Site Publishing"></p>
+                        </li>
+                        <li>
+                            <strong>Multi‑Site Collaborative Publishing</strong>
+                            <p><img src="./images/pub_3.gif" alt="Multi‑Site Publishing"></p>
+                        </li>
+                        <li>
+                            <strong>Rapid Version Rollback/Restoration</strong> (taking <code>http://localhost:5000</code> and <code>http://localhost:5001</code> as examples)
+                            <p><img src="./images/pub_4.gif" alt="Version Rollback"></p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 中文内容 -->
+                <div class="lang-zh">
+                    <h1>🚀 IIS 站点发布管理系统 (SiteDeploy)</h1>
+                    <blockquote>
+                        <strong>一句话简介</strong>：支持 IIS 站点自动化发布、多服务器集群统一部署、一键自动备份与版本还原的高效运维工具。
+                    </blockquote>
+
+                    <h2 id="zh-features">✨ 功能特性</h2>
+                    <ul>
+                        <li><strong>🌍 多语言支持</strong>：原生支持简体中文与英文切换，无缝适应不同团队。</li>
+                        <li><strong>📦 核心发布</strong>：支持一键打包、上传、覆盖并重启 IIS 站点。</li>
+                        <li><strong>🌐 多机协同</strong>：支持单机或多服务器集群统一管理与分发部署。</li>
+                        <li><strong>🛡️ 安全保障</strong>：内置自动化备份与快速版本还原机制，发布失败秒级回滚。</li>
+                    </ul>
+                    <p><img src="./images/pub_1.gif" alt="发布演示"></p>
+
+                    <h2 id="zh-install">🛠️ 安装与配置</h2>
+                    <h3 id="zh-single">1. 单服务器部署（IIS 模式）</h3>
+                    <ol>
+                        <li><strong>下载与解压</strong>：下载主节点安装包 <code>SiteDeploy.zip</code>，并解压至 <code>C:\inetpub\wwwroot\SiteDeploy</code>。</li>
+                        <li>
+                            <strong>配置应用程序池</strong>：
+                            <ul>
+                                <li>名称：<code>sitedeploy</code></li>
+                                <li>.NET CLR 版本：<code>无托管代码</code></li>
+                                <li>托管管道模式：<code>集成</code></li>
+                                <li>高级设置：将 <strong>标识 (Identity)</strong> 由 <code>ApplicationPoolIdentity</code> 更改为 <strong><code>LocalSystem</code></strong>。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>添加网站</strong>：
+                            <ul>
+                                <li>网站名称：<code>SiteDeploy</code></li>
+                                <li>应用程序池：选择 <code>sitedeploy</code></li>
+                                <li>物理路径：<code>C:\inetpub\wwwroot\SiteDeploy</code></li>
+                                <li>端口号：自定义（例如 <code>8080</code>）</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>访问与初始化</strong>：
+                            <ul>
+                                <li>访问地址：<code>http://localhost:8080</code></li>
+                                <li>
+                                    <strong>登录凭证</strong>：
+                                    <ul>
+                                        <li>用户名：<code>admin</code></li>
+                                        <li>初始密码：查看站点根目录下的 <code>admin_initial_password.txt</code> 文件。</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>配置文件说明 (<code>appsettings.json</code>)</strong>：
+                            <ul>
+                                <li><code>SystemConfig.Urls</code>：配置从节点的 URL 地址。</li>
+                                <li><code>SystemConfig.IpWhitelist</code>：IP 白名单，用于限制访问。</li>
+                                <li><code>BindUrl</code>：当前站点绑定的 URL 地址（若配置为 Windows 服务时需填写，IIS 站点可忽略）。</li>
+                                <li><code>BasePath</code>：站点的基础路径。</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="zh-multi">2. 多服务器部署（IIS 模式）</h3>
+                    <blockquote><strong>前提条件</strong>：请确保主节点已成功部署并运行。</blockquote>
+                    <ol>
+                        <li><strong>下载与解压</strong>：下载从节点安装包 <code>SiteDeploy.Node.zip</code>，并解压至 <code>C:\inetpub\wwwroot\SiteDeploy.Node</code>。</li>
+                        <li>
+                            <strong>配置应用程序池</strong>：
+                            <ul>
+                                <li>名称：<code>sitedeploy.node</code></li>
+                                <li>.NET CLR 版本：<code>无托管代码</code></li>
+                                <li>托管管道模式：<code>集成</code></li>
+                                <li>高级设置：将 <strong>标识 (Identity)</strong> 由 <code>ApplicationPoolIdentity</code> 更改为 <strong><code>LocalSystem</code></strong>。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>添加网站</strong>：
+                            <ul>
+                                <li>网站名称：<code>SiteDeploy.Node</code></li>
+                                <li>应用程序池：选择 <code>sitedeploy.node</code></li>
+                                <li>物理路径：<code>C:\inetpub\wwwroot\SiteDeploy.Node</code></li>
+                                <li>端口号：自定义（例如 <code>8081</code>）</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>验证从节点</strong>：
+                            <p>访问 <code>http://localhost:8081</code>。若页面正常显示当前站点的 URL，则说明配置成功（从节点无需登录）。</p>
+                            <p><strong>配置文件说明 (<code>appsettings.json</code>)</strong>：</p>
+                            <ul>
+                                <li><code>SystemConfig.IpWhitelist</code>：IP 白名单限制。</li>
+                                <li><code>BindUrl</code>：Windows 服务模式下的绑定地址（IIS 模式可忽略）。</li>
+                                <li><code>BasePath</code>：站点基础路径。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>关联主节点</strong>：
+                            <p>在主节点的配置文件 (<code>appsettings.json</code>) 中，将从节点 URL 添加至 <code>SystemConfig.Urls</code>（例如：<code>http://localhost:8081</code>）。</p>
+                        </li>
+                    </ol>
+
+                    <h3 id="zh-proxy">3. 反向代理配置（高安全性环境）</h3>
+                    <blockquote><strong>适用场景</strong>：在安全性要求较高的环境中，若不便将应用程序池标识切换为 <code>LocalSystem</code>，可通过反向代理方式运行。</blockquote>
+                    <ol>
+                        <li>
+                            <strong>修改配置文件 (<code>appsettings.json</code>)</strong>
+                            <ul>
+                                <li>设置反向代理地址 <code>BindUrl</code>（例如：<code>http://127.0.0.1:5002</code>）。</li>
+                                <li>设置站点基础路径 <code>BasePath</code>（例如：<code>sitedeploy</code>）。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>安装并启动 Windows 服务</strong>
+                            <p>以管理员身份运行根目录下的 <code>install‑service.bat</code> 脚本。</p>
+                            <p>确保浏览器可以正常访问 <code>http://127.0.0.1:5002/sitedeploy</code>。</p>
+                        </li>
+                        <li>
+                            <strong>配置 IIS 反向代理</strong>
+                            <p>确保 IIS 已安装反向代理模块（<strong>URL Rewrite</strong> + <strong>Application Request Routing (ARR)</strong>）。</p>
+                            <p>创建空目录：<code>C:\inetpub\wwwroot\SiteDeploy‑Proxy</code>。</p>
+                            <p>在 IIS 中新增网站，绑定端口（如 <code>8080</code>），物理路径指向上述创建的代理目录。</p>
+                            <p>替换该站点的 <code>web.config</code> 文件内容：</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+  &lt;system.webServer&gt;
+    &lt;rewrite&gt;
+      &lt;rules&gt;
+        &lt;rule name="ReverseProxyInboundRule1" stopProcessing="true"&gt;
+          &lt;match url="(.*)" /&gt;
+          &lt;action type="Rewrite" url="http://127.0.0.1:5002/sitedeploy/{R:1}" /&gt;
+        &lt;/rule&gt;
+      &lt;/rules&gt;
+    &lt;/rewrite&gt;
+  &lt;/system.webServer&gt;
+&lt;/configuration&gt;</code></pre>
+                        </li>
+                        <li><strong>访问系统</strong>：浏览器访问 <code>http://localhost:8080</code> 即可使用系统。</li>
+                    </ol>
+
+                    <h2 id="zh-usage">💡 使用指南</h2>
+                    <h3 id="zh-login">系统登录</h3>
+                    <blockquote>⚠️ <strong>注意</strong>：统一在主节点进行登录，从节点不提供登录界面。</blockquote>
+                    <ul>
+                        <li><strong>默认账号</strong>：<code>admin</code></li>
+                        <li><strong>默认密码</strong>：站点根目录下的 <code>admin_initial_password.txt</code> 文件中。</li>
+                    </ul>
+
+                    <h3 id="zh-perm">权限管理</h3>
+                    <p>管理员登录后可创建子用户，并支持精细化权限控制，指定用户可操作的服务器及具体站点。</p>
+                    <p><strong>配置示例</strong>：允许 <code>user1</code> 操作 <code>http://localhost:5000</code>（crm‑01, crm‑02 站点）以及 <code>http://localhost:5001</code>（app01, crm‑01, crm‑02 站点）。</p>
+                    <p><img src="./images/per_1.gif" alt="权限管理配置"></p>
+
+                    <h3 id="zh-cases">使用案例</h3>
+                    <ul>
+                        <li>
+                            <strong>单站点发布</strong>
+                            <p><img src="./images/pub_2.gif" alt="单站点发布"></p>
+                        </li>
+                        <li>
+                            <strong>多站点协同发布</strong>
+                            <p><img src="./images/pub_3.gif" alt="多站点发布"></p>
+                        </li>
+                        <li>
+                            <strong>版本快速回滚/还原</strong>（以 <code>http://localhost:5000</code> 和 <code>http://localhost:5001</code> 为例）
+                            <p><img src="./images/pub_4.gif" alt="版本还原"></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        // 1. 切换语言控制
+        const btns = document.querySelectorAll(".lang-btn");
+        const enDoms = document.querySelectorAll(".lang-en");
+        const zhDoms = document.querySelectorAll(".lang-zh");
+
+        btns.forEach(btn => {
+            btn.onclick = function() {
+                const lang = this.dataset.lang;
+
+                document.querySelectorAll(`.lang-btn`).forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(`.lang-btn[data-lang="${lang}"]`).forEach(b => b.classList.add("active"));
+
+                if (lang === "en") {
+                    enDoms.forEach(d => d.classList.add("show"));
+                    zhDoms.forEach(d => d.classList.remove("show"));
+                    document.documentElement.lang = "en";
+                } else {
+                    enDoms.forEach(d => d.classList.remove("show"));
+                    zhDoms.forEach(d => d.classList.add("show"));
+                    document.documentElement.lang = "zh-CN";
+                }
+                // 切换语言后重新计算一次滚动监听
+                updateActiveSidebar();
+            }
+        });
+
+        // 2. 监听页面滚动，实现左侧菜单随当前视口位置高亮
+        function updateActiveSidebar() {
+            // 获取当前显示的语言容器内的所有标题（h2, h3）
+            const currentLangDoc = document.querySelector('.lang-en.show') || document.querySelector('.lang-zh.show');
+            if (!currentLangDoc) return;
+
+            const headings = currentLangDoc.querySelectorAll('h2[id], h3[id]');
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav.show a');
+
+            let scrollPosition = window.scrollY + 100; // 偏移量，判断触发时机
+
+            let currentActiveId = '';
+            headings.forEach(heading => {
+                if (heading.offsetTop <= scrollPosition) {
+                    currentActiveId = heading.getAttribute('id');
+                }
+            });
+
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if (href === '#' + currentActiveId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveSidebar);
+        window.addEventListener('load', updateActiveSidebar);
+    </script>
+</body>
+</html>

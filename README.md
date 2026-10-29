@@ -29,7 +29,7 @@
 - **🌐 Multi-machine Coordination**: Supports unified management and distributed deployment for single-server or multi-server clusters.
 - **🛡️ Security Guarantee**: Built-in automated backup and rapid version rollback mechanisms, allowing second-level rollback if publishing fails.
 
-![Publishing Demo](./readme-images/pub_1.gif)
+![Publishing Demo](./wwwroot/images/pub_1.gif)
 
 ---
 
@@ -132,15 +132,15 @@
 - After logging in, the administrator can create sub-users and configure fine-grained permissions, specifying which servers and specific sites each user can operate.
 - **Configuration Example**: Allowing `user1` to operate `http://localhost:5000` (crm-01, crm-02 sites) and `http://localhost:5001` (app01, crm-01, crm-02 sites).
 
-![Permission Management Configuration](./readme-images/per_1.gif)
+![Permission Management Configuration](./wwwroot/images/per_1.gif)
 
 ### Use Cases
 
 - **Single Site Publishing**:
-  ![Single Site Publishing](./readme-images/pub_2.gif)
+  ![Single Site Publishing](./wwwroot/images/pub_2.gif)
 
 - **Multi-Site Collaborative Publishing**:
-  ![Multi-Site Publishing](./readme-images/pub_3.gif)
+  ![Multi-Site Publishing](./wwwroot/images/pub_3.gif)
 
 - **Rapid Version Rollback/Restoration** (taking `http://localhost:5000` and `http://localhost:5001` as examples):
-  ![Version Rollback](./readme-images/pub_4.gif)
+  ![Version Rollback](./wwwroot/images/pub_4.gif)
