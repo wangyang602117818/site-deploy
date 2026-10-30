@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SiteDeploy.Document.DBContext;
 using SiteDeploy.Document.Models;
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace SiteDeploy.Document.Controllers
@@ -23,15 +26,30 @@ namespace SiteDeploy.Document.Controllers
         {
             Request.EnableBuffering();
 
-            string payload;
-            using (var reader = new StreamReader(Request.Body))
+            byte[] rawBodyBytes;
+            using (var ms = new MemoryStream())
             {
-                payload = await reader.ReadToEndAsync();
-                Request.Body.Position = 0;
+                await Request.Body.CopyToAsync(ms);
+                rawBodyBytes = ms.ToArray();
+                Request.Body.Position = 0; //重置流，框架后续如果要读还可以读
             }
 
+            // 为了业务解析，再转成字符串用于json解析
+            string payload = System.Text.Encoding.UTF8.GetString(rawBodyBytes);
+
             var signatureHeader = Request.Headers["x-signature"].FirstOrDefault();
-            if (!LemonSignatureHelper.Verify(payload, signatureHeader, _lsWebhookSecret))
+
+            // =========调试日志=========
+            Log.Information($"received X-Signature:{signatureHeader}");
+            Log.Information($"Body字节长度:{rawBodyBytes.Length}");
+            Log.Information($"Body文本:\n{payload}");
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_lsWebhookSecret));
+            var hash = hmac.ComputeHash(rawBodyBytes);
+            string localCalcHex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            Log.Information($"local Signature:{localCalcHex}");
+
+            // 传入原始字节数组验签！
+            if (!LemonSignatureHelper.Verify(rawBodyBytes, signatureHeader, _lsWebhookSecret))
             {
                 return Unauthorized("Webhook signature verification failed");
             }

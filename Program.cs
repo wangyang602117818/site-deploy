@@ -11,6 +11,7 @@ string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "lo
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
+    .WriteTo.Console()
     .CreateLogger();
 
 //” º˛∞Ô÷˙¿‡
