@@ -54,7 +54,7 @@ namespace SiteDeploy.Document.Models
             message.Body = multipart;
 
             using var client = new MailKit.Net.Smtp.SmtpClient();
-            await client.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.StartTls);
+            await client.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
             await client.AuthenticateAsync(user, pass);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);

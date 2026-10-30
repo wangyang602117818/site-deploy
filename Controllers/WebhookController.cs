@@ -36,18 +36,7 @@ namespace SiteDeploy.Document.Controllers
 
             // 为了业务解析，再转成字符串用于json解析
             string payload = System.Text.Encoding.UTF8.GetString(rawBodyBytes);
-
             var signatureHeader = Request.Headers["x-signature"].FirstOrDefault();
-
-            // =========调试日志=========
-            Log.Information($"received X-Signature:{signatureHeader}");
-            Log.Information($"Body字节长度:{rawBodyBytes.Length}");
-            Log.Information($"Body文本:\n{payload}");
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_lsWebhookSecret));
-            var hash = hmac.ComputeHash(rawBodyBytes);
-            string localCalcHex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-            Log.Information($"local Signature:{localCalcHex}");
-
             // 传入原始字节数组验签！
             if (!LemonSignatureHelper.Verify(rawBodyBytes, signatureHeader, _lsWebhookSecret))
             {
