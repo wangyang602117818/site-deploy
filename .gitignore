@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 SSO.TaskScheduling/sbl.config
 SSO.Web/sbl.config
+/license-private.pem
