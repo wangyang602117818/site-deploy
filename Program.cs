@@ -17,7 +17,7 @@ Log.Logger = new LoggerConfiguration()
 //邮件帮助类
 builder.Services.AddScoped<EmailHelper>();
 //注册后台服务
-builder.Services.AddHostedService<LicenseEmailBackgroundService>();
+//builder.Services.AddHostedService<LicenseEmailBackgroundService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

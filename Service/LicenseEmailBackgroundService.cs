@@ -57,7 +57,7 @@ namespace SiteDeploy.Document.Service
                             catch (Exception ex)
                             {
                                 Log.Error(ex, $"订单{order.OrderId}发送邮件失败，下一轮会重试");
-                                DingRobotHelper.SendDingError("授权邮件发送失败", $"订单{order.OrderId}发送邮件失败，下一轮会重试 {ex.Message}").Wait();
+                                DingRobotHelper.SendDingError("授权邮件发送失败", $"订单{order.OrderId}发送邮件失败 {order.CustomerEmail}，下一轮会重试 {ex.Message}").Wait();
                             }
                         }
                     }
