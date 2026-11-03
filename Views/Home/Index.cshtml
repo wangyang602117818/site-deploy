@@ -1,0 +1,845 @@
+﻿@using System.IO
+@functions {
+    // 辅助方法：获取文件大小并格式化为 MB
+    public string GetFileSize(string path)
+    {
+        if (File.Exists(path))
+        {
+            var info = new FileInfo(path);
+            double sizeMb = info.Length / (1024.0 * 1024.0);
+            return $"~{sizeMb:F1} MB";
+        }
+        return "~0.0 MB";
+    }
+
+    // 辅助方法：获取文件最后修改日期
+    public string GetFileDate(string path)
+    {
+        if (File.Exists(path))
+        {
+            return File.GetLastWriteTime(path).ToString("yyyy-MM-dd");
+        }
+        return "2026-10-15";
+    }
+}
+
+@{
+    // 定义 4 个文件的物理路径（区分 framework-dependency 和 self-contained 目录）
+    var file1Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "framework-dependency", "SiteDeploy.zip");
+    var file2Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "self-contained", "SiteDeploy.zip");
+    var file3Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "framework-dependency", "SiteDeploy.Node.zip");
+    var file4Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "self-contained", "SiteDeploy.Node.zip");
+}
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SiteDeploy - .NET 8 IIS 自动化发布工具 | 授权与问题中心</title>
+    <meta name="description" content="SiteDeploy 是一款专为 .NET 8 开发者与 Windows 运维打造的 IIS 站点发布管理系统。支持一键打包部署、多服务器集群协同、反向代理配置及秒级版本回滚。" />
+    <meta name="keywords" content="IIS发布工具,ASP.NET Core部署,IIS站点管理,反向代理管理,多服务器集群部署,Windows运维工具,SiteDeploy,.NET8部署" />
+
+    <!-- 引入样式文件 -->
+    <link href="~/css/site.css" rel="stylesheet" />
+    <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
+</head>
+<body>
+
+    <!-- 1. 顶部全局导航栏（顶部左侧仅保留：Logo，使用文档，购买License，下载中心，问题中心） -->
+    <header class="global-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <img src="~/favicon.ico" alt="SiteDeploy Logo" class="brand-logo-img" />
+                <span>IIS 站点发布管理系统</span>
+            </div>
+
+            <!-- 顶部左侧导航菜单 -->
+            <nav class="header-nav-menu">
+                <a href="#doc-section" class="nav-link active" onclick="switchMainTab('doc')">使用文档</a>
+                <a href="#license-section" class="nav-link" onclick="switchMainTab('license')">购买 License</a>
+                <a href="#download-section" class="nav-link" onclick="switchMainTab('download')">下载中心</a>
+                <a href="#ticket-section" class="nav-link" onclick="switchMainTab('ticket')">问题中心</a>
+            </nav>
+
+            <div class="header-right-actions">
+                <!-- 右侧登录/用户控制面板 -->
+                <div id="user-auth-area">
+                    <button class="auth-trigger-btn" id="open-login-modal-btn">🔐 用户登录 / License 授权中心</button>
+                </div>
+                <!-- 语言切换 -->
+                <div class="lang-bar">
+                    <button class="lang-btn active" data-lang="zh" onclick="switchLanguagePage('zh')">简体中文</button>
+                    <button class="lang-btn" data-lang="en" onclick="switchLanguagePage('en')">English</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 整体文档布局容器 -->
+    <div class="doc-layout-container">
+
+        <!-- 左侧菜单栏（根据选中的顶层标签页自动切换联动） -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <!-- 文档页专用侧边导航（包含完整子菜单索引） -->
+                <div id="sidebar-doc-menu" class="sidebar-group">
+                    <div class="sidebar-title">使用文档目录</div>
+                    <ul>
+                        <li><a href="#zh-features" class="active">✨ 功能特性</a></li>
+                        <li>
+                            <a href="#zh-install">🛠️ 安装与配置</a>
+                            <ul class="sub-menu">
+                                <li><a href="#zh-single">🖥️ 1. 单服务器部署</a></li>
+                                <li><a href="#zh-multi">🌐 2. 多服务器部署</a></li>
+                                <li><a href="#zh-proxy">🔄 3. 反向代理配置</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#zh-usage">💡 使用指南</a>
+                            <ul class="sub-menu">
+                                <li><a href="#zh-login">🔑 系统登录</a></li>
+                                <li><a href="#zh-perm">🛡️ 权限管理</a></li>
+                                <li><a href="#zh-cases">📊 使用案例</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 其他页快捷侧边导航 -->
+                <div id="sidebar-other-menu" class="sidebar-group" style="display: none;">
+                    <div class="sidebar-title">快捷导航</div>
+                    <ul>
+                        <li><a href="#license-section" onclick="switchMainTab('license')">🛒 购买 License 状态</a></li>
+                        <li><a href="#download-section" onclick="switchMainTab('download')">📦 下载中心</a></li>
+                        <li><a href="#ticket-section" onclick="switchMainTab('ticket')">❓ 问题中心</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 右侧主体内容区 -->
+        <main class="main-content">
+            <div class="content-card">
+
+                <!-- 标签页 1：使用文档（包含完整无缺失的所有文字细节与图片） -->
+                <div id="tab-doc" class="main-tab-content show">
+                    <h1>🚀 IIS 站点发布管理系统 (SiteDeploy)</h1>
+                    <blockquote>
+                        <strong>一句话简介</strong>：支持 IIS 站点自动化发布、多服务器集群统一部署、一键自动备份与版本还原的高效运维工具。
+                    </blockquote>
+
+                    <h2 id="zh-features">✨ 功能特性</h2>
+                    <ul>
+                        <li><strong>🌍 多语言支持</strong>：原生支持简体中文与英文切换，无缝适应不同团队。</li>
+                        <li><strong>📦 核心发布</strong>：支持一键打包、上传、覆盖并重启 IIS 站点。</li>
+                        <li><strong>🌐 多机协同</strong>：支持单机或多服务器集群统一管理与分发部署。</li>
+                        <li><strong>🛡️ 安全保障</strong>：内置自动化备份与快速版本还原机制，发布失败秒级回滚。</li>
+                    </ul>
+                    <p><img src="./images/pub_1.gif" alt="发布演示"></p>
+
+                    <h2 id="zh-install">🛠️ 安装与配置</h2>
+
+                    <h3 id="zh-single">🖥️ 1. 单服务器部署（IIS 模式）</h3>
+                    <ol>
+                        <li><strong>下载与解压</strong>：下载主节点安装包 <code>SiteDeploy.zip</code>，并解压至 <code>C:\inetpub\wwwroot\SiteDeploy</code>。</li>
+                        <li>
+                            <strong>配置应用程序池</strong>：
+                            <ul>
+                                <li>名称：<code>sitedeploy</code></li>
+                                <li>.NET CLR 版本：<code>无托管代码</code></li>
+                                <li>托管管道模式：<code>集成</code></li>
+                                <li>高级设置：将 <strong>标识 (Identity)</strong> 由 <code>ApplicationPoolIdentity</code> 更改为 <strong><code>LocalSystem</code></strong>。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>添加网站</strong>：
+                            <ul>
+                                <li>网站名称：<code>SiteDeploy</code></li>
+                                <li>应用程序池：选择 <code>sitedeploy</code></li>
+                                <li>物理路径：<code>C:\inetpub\wwwroot\SiteDeploy</code></li>
+                                <li>端口号：自定义（例如 <code>8080</code>）</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>访问与初始化</strong>：
+                            <ul>
+                                <li>访问地址：<code>http://localhost:8080</code></li>
+                                <li>
+                                    <strong>登录凭证</strong>：
+                                    <ul>
+                                        <li>用户名：<code>admin</code></li>
+                                        <li>初始密码：查看站点根目录下的 <code>admin_initial_password.txt</code> 文件。</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>配置文件说明 (<code>appsettings.json</code>)</strong>：
+                            <ul>
+                                <li><code>SystemConfig.Urls</code>：配置从节点的 URL 地址。</li>
+                                <li><code>SystemConfig.IpWhitelist</code>：IP 白名单，用于限制访问。</li>
+                                <li><code>BindUrl</code>：当前站点绑定的 URL 地址（若配置为 Windows 服务时需填写，IIS 站点可忽略）。</li>
+                                <li><code>BasePath</code>：站点的基础路径。</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="zh-multi">🌐 2. 多服务器部署（IIS 模式）</h3>
+                    <blockquote><strong>前提条件</strong>：请确保主节点已成功部署并运行。</blockquote>
+                    <ol>
+                        <li><strong>下载与解压</strong>：下载从节点安装包 <code>SiteDeploy.Node.zip</code>，并解压至 <code>C:\inetpub\wwwroot\SiteDeploy.Node</code>。</li>
+                        <li>
+                            <strong>配置应用程序池</strong>：
+                            <ul>
+                                <li>名称：<code>sitedeploy.node</code></li>
+                                <li>.NET CLR 版本：<code>无托管代码</code></li>
+                                <li>托管管道模式：<code>集成</code></li>
+                                <li>高级设置：将 <strong>标识 (Identity)</strong> 由 <code>ApplicationPoolIdentity</code> 更改为 <strong><code>LocalSystem</code></strong>。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>添加网站</strong>：
+                            <ul>
+                                <li>网站名称：<code>SiteDeploy.Node</code></li>
+                                <li>应用程序池：选择 <code>sitedeploy.node</code></li>
+                                <li>物理路径：<code>C:\inetpub\wwwroot\SiteDeploy.Node</code></li>
+                                <li>端口号：自定义（例如 <code>8081</code>）</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>验证从节点</strong>：
+                            <p>访问 <code>http://localhost:8081</code>。若页面正常显示当前站点的 URL，则说明配置成功（从节点无需登录）。</p>
+                            <p><strong>配置文件说明 (<code>appsettings.json</code>)</strong>：</p>
+                            <ul>
+                                <li><code>SystemConfig.IpWhitelist</code>：IP 白名单限制。</li>
+                                <li><code>BindUrl</code>：Windows 服务模式下的绑定地址（IIS 模式可忽略）。</li>
+                                <li><code>BasePath</code>：站点基础路径。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>关联主节点</strong>：
+                            <p>在主节点的配置文件 (<code>appsettings.json</code>) 中，将从节点 URL 添加至 <code>SystemConfig.Urls</code>（例如：<code>http://localhost:8081</code>）。</p>
+                        </li>
+                    </ol>
+
+                    <h3 id="zh-proxy">🔄 3. 反向代理配置（高安全性环境）</h3>
+                    <blockquote><strong>适用场景</strong>：在安全性要求较高的环境中，若不便将应用程序池标识切换为 <code>LocalSystem</code>，可通过反向代理方式运行。</blockquote>
+                    <ol>
+                        <li>
+                            <strong>修改配置文件 (<code>appsettings.json</code>)</strong>
+                            <ul>
+                                <li>设置反向代理地址 <code>BindUrl</code>（例如：<code>http://127.0.0.1:5002</code>）。</li>
+                                <li>设置站点基础路径 <code>BasePath</code>（例如：<code>sitedeploy</code>）。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>安装并启动 Windows 服务</strong>
+                            <p>以管理员身份运行根目录下的 <code>install‑service.bat</code> 脚本。</p>
+                            <p>确保浏览器可以正常访问 <code>http://127.0.0.1:5002/sitedeploy</code>。</p>
+                        </li>
+                        <li>
+                            <strong>配置 IIS 反向代理</strong>
+                            <p>确保 IIS 已安装反向代理模块（<strong>URL Rewrite</strong> + <strong>Application Request Routing (ARR)</strong>）。</p>
+                            <p>创建空目录：<code>C:\inetpub\wwwroot\SiteDeploy‑Proxy</code>。</p>
+                            <p>在 IIS 中新增网站，绑定端口（如 <code>8080</code>），物理路径指向上述创建的代理目录。</p>
+                            <p>替换该站点的 <code>web.config</code> 文件内容：</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+  &lt;system.webServer&gt;
+    &lt;security&gt;
+      &lt;requestFiltering&gt;
+        &lt;requestLimits maxAllowedContentLength="209715200" /&gt;
+      &lt;/requestFiltering&gt;
+    &lt;/security&gt;
+    &lt;rewrite&gt;
+      &lt;rules&gt;
+        &lt;rule name="ReverseProxyInboundRule1" stopProcessing="true"&gt;
+          &lt;match url="(.*)" /&gt;
+          &lt;action type="Rewrite" url="http://127.0.0.1:5002/sitedeploy/{R:1}" /&gt;
+        &lt;/rule&gt;
+      &lt;/rules&gt;
+    &lt;/rewrite&gt;
+  &lt;/system.webServer&gt;
+&lt;/configuration&gt;</code></pre>
+                        </li>
+                        <li><strong>访问系统</strong>：浏览器访问 <code>http://localhost:8080</code> 即可使用系统。</li>
+                    </ol>
+
+                    <h2 id="zh-usage">💡 使用指南</h2>
+                    <h3 id="zh-login">🔑 系统登录</h3>
+                    <blockquote>⚠️ <strong>注意</strong>：统一在主节点进行登录，从节点不提供登录界面。</blockquote>
+                    <ul>
+                        <li><strong>默认账号</strong>：<code>admin</code></li>
+                        <li><strong>默认密码</strong>：站点根目录下的 <code>admin_initial_password.txt</code> 文件中。</li>
+                    </ul>
+
+                    <h3 id="zh-perm">🛡️ 权限管理</h3>
+                    <p>管理员登录后可创建子用户，并支持精细化权限控制，指定用户可操作的服务器及具体站点。</p>
+                    <p><strong>配置示例</strong>：允许 <code>user1</code> 操作 <code>http://localhost:5000</code>（crm‑01, crm‑02 站点）以及 <code>http://localhost:5001</code>（app01, crm‑01, crm‑02 站点）。</p>
+                    <p><img src="./images/per_1.gif" alt="权限管理配置"></p>
+
+                    <h3 id="zh-cases">📊 使用案例</h3>
+                    <ul>
+                        <li>
+                            <strong>单站点发布</strong>
+                            <p><img src="./images/pub_2.gif" alt="单站点发布"></p>
+                        </li>
+                        <li>
+                            <strong>多站点协同发布</strong>
+                            <p><img src="./images/pub_3.gif" alt="多站点发布"></p>
+                        </li>
+                        <li>
+                            <strong>版本快速回滚/还原</strong>（以 <code>http://localhost:5000</code> 和 <code>http://localhost:5001</code> 为例）
+                            <p><img src="./images/pub_4.gif" alt="版本还原"></p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 标签页 2：购买 License 模块 -->
+                <div id="tab-license" class="main-tab-content" style="display: none;">
+                    <h1>🛒 购买与授权中心 (License Center)</h1>
+                    <p>在线购买与管理您的系统部署授权证书。</p>
+
+                    <!-- 条件 1：未购买时显示多种付款方式 -->
+                    <div id="license-unpurchased-view">
+                        <div class="license-notice-box">
+                            <h3>⚠️ 您当前尚未购买任何有效的 License 授权</h3>
+                            <p>请选择以下您习惯的付款方式完成购买，成功支付后系统将自动发放对应的 License 证书：</p>
+                        </div>
+
+                        <div class="payment-methods-grid">
+                            @* <!-- 微信支付 -->
+                            <div class="pay-card">
+                                <div class="pay-icon">💚</div>
+                                <h3>微信支付 (WeChat Pay)</h3>
+                                <p class="pay-desc">适用于中国大陆用户，扫码即刻完成购买。</p>
+                                <div class="qrcode-box">[ 微信支付 二维码 ]</div>
+                            </div>
+                            <!-- 支付宝 -->
+                            <div class="pay-card">
+                                <div class="pay-icon">💙</div>
+                                <h3>支付宝 (Alipay)</h3>
+                                <p class="pay-desc">支持花呗、信用卡、余额宝快捷结算。</p>
+                                <div class="qrcode-box">[ 支付宝 二维码 ]</div>
+                            </div> *@
+                            <!-- LemonSqueezy -->
+                            <div class="pay-card">
+                                <div class="pay-icon">🍋</div>
+                                <h3>LemonSqueezy</h3>
+                                <p class="pay-desc">支持全球信用卡、PayPal。</p>
+                                @* <a href="https://lemonsqueezy.com" target="_blank" class="pay-external-btn">跳转 LemonSqueezy 购买</a> *@
+                                <a class="lemonsqueezy-button pay-external-btn"
+                                   href="https://site-deploy.lemonsqueezy.com/checkout/buy/899682be-5149-474d-9860-3731e8870c3e?embed=1">
+                                    购买 SiteDeploy License
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 条件 2：已购买时显示完整授权表格 -->
+                    <div id="user-purchased-dashboard" style="display: none;">
+                        <div class="user-profile-bar">
+                            <span>当前授权账户：<strong id="dashboard-user-email"></strong></span>
+                            <button onclick="logoutUser()" class="logout-action-btn">退出登录</button>
+                        </div>
+                        <h3 style="margin-top: 20px; margin-bottom: 12px;">📦 我的已购 License 列表</h3>
+                        <div class="license-table-container">
+                            <table class="license-table">
+                                <thead>
+                                    <tr>
+                                        <th>License 名称</th>
+                                        <th>购买账户</th>
+                                        <th>购买时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchased-license-tbody">
+                                    <!-- 动态渲染 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签页 3：下载中心 -->
+                <div id="tab-download" class="main-tab-content" style="display: none;">
+                    <h2 id="download-center">📦 下载中心</h2>
+                    <p>目标运行时：<code>win-x64</code> | 目标框架：<code>.net8.0</code> | <span style="color: var(--primary-color);">当前最新版本：v1.2.0</span></p>
+
+                    <div class="download-grid">
+                        <!-- 1. 主节点（框架依赖版） -->
+                        <div class="download-card">
+                            <h3>1. SiteDeploy 主节点（框架依赖版）</h3>
+                            <p class="download-desc"><strong>包描述</strong>：适用于已安装 .NET 8.0 运行时的 Windows 服务器，包体积小。</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | .net8.0</span>
+                                <span class="file-size">📦 @GetFileSize(file1Path) | 📅 @GetFileDate(file1Path)</span>
+                            </div>
+                            <a href="files/framework-dependency/SiteDeploy.zip" class="download-btn">⬇️ 下载 SiteDeploy.zip</a>
+                        </div>
+
+                        <!-- 2. 主节点（独立打包版） -->
+                        <div class="download-card">
+                            <h3>2. SiteDeploy 主节点（独立打包版）</h3>
+                            <p class="download-desc"><strong>包描述</strong>：完整集成 .NET 8 运行时，服务器无需单独安装 .NET 环境开箱即用。</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | 独立运行时</span>
+                                <span class="file-size">📦 @GetFileSize(file2Path) | 📅 @GetFileDate(file2Path)</span>
+                            </div>
+                            <a href="files/self-contained/SiteDeploy.zip" class="download-btn">⬇️ 下载 SiteDeploy.zip</a>
+                        </div>
+
+                        <!-- 3. 从节点（框架依赖版） -->
+                        <div class="download-card">
+                            <h3>3. SiteDeploy 从节点（框架依赖版）</h3>
+                            <p class="download-desc"><strong>包描述</strong>：用于集群多机协同部署，需目标从节点预配置 .NET 8.0 环境。</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | .net8.0</span>
+                                <span class="file-size">📦 @GetFileSize(file3Path) | 📅 @GetFileDate(file3Path)</span>
+                            </div>
+                            <a href="files/framework-dependency/SiteDeploy.Node.zip" class="download-btn">⬇️ 下载 SiteDeploy.Node.zip</a>
+                        </div>
+
+                        <!-- 4. 从节点（独立打包版） -->
+                        <div class="download-card">
+                            <h3>4. SiteDeploy 从节点（独立打包版）</h3>
+                            <p class="download-desc"><strong>包描述</strong>：包含完整独立运行时，适合纯净环境下的从节点一键部署。</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | 独立运行时</span>
+                                <span class="file-size">📦 @GetFileSize(file4Path) | 📅 @GetFileDate(file4Path)</span>
+                            </div>
+                            <a href="files/self-contained/SiteDeploy.Node.zip" class="download-btn">⬇️ 下载 SiteDeploy.Node.zip</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签页 4：问题中心 -->
+                <div id="tab-ticket" class="main-tab-content" style="display: none;">
+                    <h2 id="ticket-section">❓ 问题中心 (Issue Center)</h2>
+                    <p>如果在部署、反向代理配置或 License 激活过程中遇到技术问题，您可以在这里发起问题并查看沟通记录：</p>
+
+                    <div class="ticket-action-bar">
+                        <button class="submit-login-btn" style="width: auto; padding: 8px 18px;" onclick="openNewTicketModal()">➕ 提交新问题</button>
+                    </div>
+
+                    <div class="license-table-container" style="margin-top: 16px;">
+                        <table class="license-table">
+                            <thead>
+                                <tr>
+                                    <th>问题编号</th>
+                                    <th>提问用户</th>
+                                    <th>状态</th>
+                                    <th>最后更新时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticket-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 弹窗 (Modal)：用户登录 / License 授权中心 (支持完整的中文翻译与邮箱验证码流程) -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🔐 用户登录 / License 授权中心</h3>
+                <button class="modal-close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="login-form-wrapper">
+                    <p class="modal-tip">请输入您的工作邮箱获取验证码，登录后可管理您的 License 授权与问题中心记录。</p>
+                    <div class="form-group">
+                        <label>邮箱地址 (Email)</label>
+                        <div class="input-with-btn">
+                            <input type="email" id="user-email-input" placeholder="name@example.com" />
+                            <button id="send-code-btn" type="button" onclick="sendVerifyCode()">获取验证码</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>验证码 (Verification Code)</label>
+                        <input type="text" id="verify-code-input" placeholder="请输入6位验证码" />
+                    </div>
+                    <button id="login-btn" class="submit-login-btn" onclick="submitLogin()">验证并登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="new-ticket-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>➕ 提交新问题</h3>
+                <button class="modal-close-btn" onclick="closeNewTicketModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>问题描述</label>
+                    <textarea id="new-ticket-content" class="modal-textarea" placeholder="请描述你遇到的问题，便于我们快速定位"></textarea>
+                </div>
+                <button id="new-ticket-submit-btn" class="submit-login-btn" onclick="submitNewTicket()">提交问题</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ticket-detail-modal">
+        <div class="modal-container modal-container-lg">
+            <div class="modal-header">
+                <h3>🧾 问题详情</h3>
+                <button class="modal-close-btn" onclick="closeTicketDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-detail-meta">
+                    <span>问题编号：<strong id="ticket-detail-id"></strong></span>
+                    <span>提问用户：<strong id="ticket-detail-email"></strong></span>
+                    <span>状态：<strong id="ticket-detail-status"></strong></span>
+                </div>
+                <div id="ticket-message-list" class="ticket-message-list"></div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>继续补充</label>
+                    <textarea id="ticket-reply-content" class="modal-textarea" placeholder="输入补充说明或回复内容"></textarea>
+                </div>
+                <button id="ticket-reply-btn" class="submit-login-btn" onclick="submitTicketReply()">提交回复</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 前端交互 JavaScript 脚本 -->
+    <script>
+        // 切换顶部主菜单 Tab
+        function switchMainTab(tabName) {
+            document.querySelectorAll('.main-tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.header-nav-menu .nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-group').forEach(el => el.style.display = 'none');
+
+            if (tabName === 'doc') {
+                document.getElementById('tab-doc').style.display = 'block'; 
+                document.getElementById('sidebar-doc-menu').style.display = 'block';
+            } else if (tabName === 'license') {
+                document.getElementById('tab-license').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+                checkLoginStatusForLicenseView();
+            } else if (tabName === 'download') {
+                document.getElementById('tab-download').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+            } else if (tabName === 'ticket') {
+                document.getElementById('tab-ticket').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+            }
+
+            // 高亮对应的顶部链接
+            const activeNav = Array.from(document.querySelectorAll('.header-nav-menu .nav-link')).find(a => a.getAttribute('onclick').includes(tabName));
+            if (activeNav) activeNav.classList.add('active');
+        }
+
+        function switchLanguagePage(lang) {
+            if (lang === 'en') {
+                window.location.href = '/en';
+                return;
+            }
+
+            window.location.href = '/';
+        }
+
+        // 弹窗控制
+        const loginModal = document.getElementById('login-modal');
+        const newTicketModal = document.getElementById('new-ticket-modal');
+        const ticketDetailModal = document.getElementById('ticket-detail-modal');
+        let currentTicketId = '';
+
+        document.getElementById('open-login-modal-btn').onclick = () => loginModal.classList.add('show');
+        function closeLoginModal() { loginModal.classList.remove('show'); }
+        function closeNewTicketModal() { newTicketModal.classList.remove('show'); }
+        function closeTicketDetailModal() { ticketDetailModal.classList.remove('show'); }
+
+        function setButtonLoading(button, loadingText, normalText, isLoading) {
+            if (!button) {
+                return;
+            }
+
+            button.disabled = isLoading;
+            button.dataset.normalText = button.dataset.normalText || normalText;
+            button.textContent = isLoading ? loadingText : (button.dataset.normalText || normalText);
+        }
+
+        // 发送验证码
+        async function sendVerifyCode() {
+            const email = document.getElementById('user-email-input').value.trim();
+            const sendCodeBtn = document.getElementById('send-code-btn');
+
+            if (!email || !email.includes('@@')) {
+                alert('请输入正确的邮箱地址！');
+                return;
+            }
+
+            setButtonLoading(sendCodeBtn, '发送中...', '获取验证码', true);
+
+            try {
+                const resp = await fetch('/send-verification-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || '发送失败');
+                    return;
+                }
+
+                alert(data.message || '验证码已发送');
+            } catch (error) {
+                alert('网络异常，请稍后重试');
+            } finally {
+                setButtonLoading(sendCodeBtn, '发送中...', '获取验证码', false);
+            }
+        }
+
+        // 验证登录
+        async function submitLogin() {
+            const email = document.getElementById('user-email-input').value.trim();
+            const code = document.getElementById('verify-code-input').value.trim();
+            const loginBtn = document.getElementById('login-btn');
+
+            if (!email || !code) {
+                alert('请输入邮箱和验证码');
+                return;
+            }
+
+            setButtonLoading(loginBtn, '登录中...', '验证并登录', true);
+
+            try {
+                const resp = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || '登录失败');
+                    return;
+                }
+
+                closeLoginModal();
+                updateUIAfterLogin(data.email);
+                await checkLoginStatusForLicenseView();
+                await loadTicketList();
+                switchMainTab('license');
+            } catch (error) {
+                alert('网络异常，请稍后重试');
+            } finally {
+                setButtonLoading(loginBtn, '登录中...', '验证并登录', false);
+            }
+        }
+
+        // 退出登录
+        async function logoutUser() {
+            await fetch('/logout');
+            location.reload();
+        }
+
+        function updateUIAfterLogin(email) {
+            document.getElementById('user-auth-area').innerHTML =
+                `<div style="display:flex; gap:8px; align-items:center;">
+                    <button class="auth-trigger-btn logged" onclick="switchMainTab('license')">👤 ${email}</button>
+                    <button class="logout-action-btn" onclick="logoutUser()">退出登录</button>
+                </div>`;
+        }
+
+        async function checkLoginStatusForLicenseView() {
+            const authResp = await fetch('/auth/status');
+            if (!authResp.ok) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            const auth = await authResp.json();
+            if (!auth.isAuthenticated) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            updateUIAfterLogin(auth.email);
+            const listResp = await fetch('/license/list');
+            const list = listResp.ok ? await listResp.json() : [];
+            const tbody = document.getElementById('purchased-license-tbody');
+
+            if (!list.length) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('license-unpurchased-view').style.display = 'none';
+            document.getElementById('user-purchased-dashboard').style.display = 'block';
+            document.getElementById('dashboard-user-email').textContent = auth.email;
+
+            tbody.innerHTML = list.map(x => `
+                <tr>
+                    <td><strong>Order #${x.orderNumber}</strong></td>
+                    <td>${x.customerEmail}</td>
+                    <td>${new Date(x.createdAt).toLocaleString()}</td>
+                    <td><button class="dl-lic-btn" onclick="alert('可接入真实下载接口')">下载 License</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadTicketList() {
+            const resp = await fetch('/ticket/list');
+            if (!resp.ok) {
+                document.getElementById('ticket-tbody').innerHTML = `<tr><td colspan="5">请先登录后查看问题列表</td></tr>`;
+                return;
+            }
+
+            const list = await resp.json();
+            const tbody = document.getElementById('ticket-tbody');
+
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="5">暂无问题，点击“提交新问题”创建</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(x => `
+                <tr>
+                    <td>#${x.id}</td>
+                    <td>${x.email}</td>
+                    <td>${x.status}</td>
+                    <td>${new Date(x.updatedAt).toLocaleString()}</td>
+                    <td><button class="dl-lic-btn" onclick="viewTicketDetail('${x.id}')">查看详情</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function openNewTicketModal() {
+            const authResp = await fetch('/auth/status');
+            if (!authResp.ok) {
+                alert('请先登录后再提交问题');
+                return;
+            }
+
+            const auth = await authResp.json();
+            if (!auth.isAuthenticated) {
+                alert('请先登录后再提交问题');
+                return;
+            }
+
+            document.getElementById('new-ticket-content').value = '';
+            newTicketModal.classList.add('show');
+        }
+
+        async function submitNewTicket() {
+            const content = document.getElementById('new-ticket-content').value.trim();
+            const submitBtn = document.getElementById('new-ticket-submit-btn');
+
+            if (!content) {
+                alert('请输入问题描述');
+                return;
+            }
+
+            setButtonLoading(submitBtn, '提交中...', '提交问题', true);
+
+            try {
+                const resp = await fetch('/ticket/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || '创建失败');
+                    return;
+                }
+
+                closeNewTicketModal();
+                await loadTicketList();
+                await viewTicketDetail(data.ticketId);
+            } catch (error) {
+                alert('网络异常，请稍后重试');
+            } finally {
+                setButtonLoading(submitBtn, '提交中...', '提交问题', false);
+            }
+        }
+
+        async function viewTicketDetail(id) {
+            const resp = await fetch(`/ticket/${id}`);
+            const data = await resp.json();
+            if (!resp.ok) {
+                alert(data.message || '获取问题详情失败');
+                return;
+            }
+
+            currentTicketId = id;
+            document.getElementById('ticket-detail-id').textContent = `#${id}`;
+            document.getElementById('ticket-detail-email').textContent = data.email;
+            document.getElementById('ticket-detail-status').textContent = data.status;
+            document.getElementById('ticket-reply-content').value = '';
+
+            const messageList = document.getElementById('ticket-message-list');
+            if (!data.messages || !data.messages.length) {
+                messageList.innerHTML = '<div class="ticket-message-empty">暂无沟通记录</div>';
+            } else {
+                messageList.innerHTML = data.messages.map(x => `
+                    <div class="ticket-message-item ${x.senderType === 'User' ? 'user' : 'admin'}">
+                        <div class="ticket-message-meta">${x.senderType} · ${new Date(x.createAt).toLocaleString()}</div>
+                        <div class="ticket-message-content">${x.content}</div>
+                    </div>
+                `).join('');
+            }
+
+            ticketDetailModal.classList.add('show');
+        }
+
+        async function submitTicketReply() {
+            const content = document.getElementById('ticket-reply-content').value.trim();
+            const replyBtn = document.getElementById('ticket-reply-btn');
+
+            if (!currentTicketId) {
+                return;
+            }
+
+            if (!content) {
+                alert('请输入回复内容');
+                return;
+            }
+
+            setButtonLoading(replyBtn, '提交中...', '提交回复', true);
+
+            try {
+                const resp = await fetch(`/ticket/${currentTicketId}/reply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || '提交失败');
+                    return;
+                }
+
+                await viewTicketDetail(currentTicketId);
+                await loadTicketList();
+            } catch (error) {
+                alert('网络异常，请稍后重试');
+            } finally {
+                setButtonLoading(replyBtn, '提交中...', '提交回复', false);
+            }
+        }
+
+        window.onload = async () => {
+            await checkLoginStatusForLicenseView();
+            await loadTicketList();
+        };
+    </script>
+</body>
+</html>

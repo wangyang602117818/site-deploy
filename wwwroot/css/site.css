@@ -1,0 +1,663 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --bg-body: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --border-color: #e2e8f0;
+    --header-height: 60px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+    line-height: 1.7;
+    color: var(--text-main);
+    background-color: var(--bg-body);
+}
+
+/* 顶部全局导航栏 */
+.global-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 1350px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.brand-logo-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+/* 顶部左侧导航菜单 */
+.header-nav-menu {
+    display: flex;
+    gap: 24px;
+}
+
+    .header-nav-menu .nav-link {
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        transition: color 0.2s;
+        cursor: pointer;
+    }
+
+        .header-nav-menu .nav-link:hover,
+        .header-nav-menu .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+.header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.auth-trigger-btn {
+    padding: 6px 14px;
+    background: #f1f5f9;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .auth-trigger-btn:hover {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+    }
+
+    .auth-trigger-btn.logged {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+.lang-bar {
+    display: flex;
+    gap: 6px;
+}
+
+button.lang-btn {
+    padding: 5px 12px;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+    button.lang-btn.active {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+    }
+
+/* 整体文档双栏大容器 */
+.doc-layout-container {
+    display: flex;
+    max-width: 1350px;
+    margin: var(--header-height) auto 0 auto;
+    min-height: calc(100vh - var(--header-height));
+}
+
+.sidebar {
+    width: 260px;
+    height: calc(100vh - var(--header-height));
+    position: sticky;
+    top: var(--header-height);
+    background: transparent;
+    padding: 36px 16px 36px 0px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.sidebar-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    padding-left: 10px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin-bottom: 4px;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 6px 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+        color: var(--primary-color);
+        background-color: #f1f5f9;
+        font-weight: 600;
+    }
+
+.sidebar-nav .sub-menu {
+    padding-left: 12px;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    border-left: 1px solid #f1f5f9;
+}
+
+    .sidebar-nav .sub-menu a {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0px 80px 0px;
+}
+
+.content-card {
+    width: 100%;
+}
+
+/* 详细图文排版样式 */
+h1 {
+    font-size: 26px;
+    margin-bottom: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+h2 {
+    font-size: 18px;
+    margin: 36px 0 14px 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+h3 {
+    font-size: 15px;
+    margin: 24px 0 10px 0;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+p {
+    margin-bottom: 14px;
+    color: #334155;
+    font-size: 14.5px;
+}
+
+blockquote {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    border-left: 3px solid var(--primary-color);
+    margin: 18px 0;
+    border-radius: 4px;
+    color: #334155;
+}
+
+pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 14px 16px;
+    overflow-x: auto;
+    border-radius: 6px;
+    margin: 16px 0;
+    font-size: 13px;
+}
+
+code {
+    font-family: monospace;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+ul, ol {
+    padding-left: 20px;
+    margin: 14px 0;
+    color: #334155;
+    font-size: 14.5px;
+}
+
+li {
+    margin: 5px 0;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 14px 0;
+    border: 1px solid var(--border-color);
+}
+
+/* 下载网格卡片样式 */
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+    margin-bottom: 30px;
+}
+
+.download-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .download-card h3 {
+        font-size: 14.5px;
+        margin: 0 0 8px 0;
+    }
+
+.download-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.badge-runtime {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 4px;
+    width: fit-content;
+    margin-bottom: 12px;
+}
+
+.download-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.download-btn {
+    display: inline-block;
+    text-align: center;
+    padding: 8px 12px;
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* 购买 License 网格及未购买卡片样式 */
+.license-notice-box {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.pay-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+}
+
+    .pay-card.recommended {
+        border-color: #bfdbfe;
+        background: #eff6ff;
+    }
+
+.pay-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.pay-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin: 8px 0 12px 0;
+}
+
+.qrcode-box {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 20px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pay-external-btn {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--primary-color);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* 已登录面板与 License 表格 */
+.user-profile-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    font-size: 13.5px;
+}
+
+.logout-action-btn {
+    padding: 4px 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.license-table-container {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.modal-container-lg {
+    max-width: 760px;
+}
+
+.license-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+    .license-table th, .license-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .license-table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+.dl-lic-btn {
+    padding: 4px 8px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* 登录/授权中心弹窗 (Modal) 样式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+.modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+}
+
+    .modal-header h3 {
+        font-size: 16px;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+.modal-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 24px 20px;
+}
+
+.modal-tip {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+.input-with-btn {
+    display: flex;
+    gap: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.modal-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.ticket-detail-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.ticket-message-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    background: #f8fafc;
+}
+
+.ticket-message-item {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+}
+
+.ticket-message-item.user {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.ticket-message-meta {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.ticket-message-content {
+    font-size: 13.5px;
+    color: #1e293b;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.ticket-message-empty {
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+    padding: 18px 0;
+}
+
+#send-code-btn {
+    padding: 0 14px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.submit-login-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 响应式自适应 */
+@media (max-width: 900px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    .payment-methods-grid, .download-grid {
+        grid-template-columns: 1fr;
+    }
+}

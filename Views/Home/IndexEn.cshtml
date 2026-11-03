@@ -1,0 +1,797 @@
+﻿
+@functions {
+    public string GetFileSize(string path)
+    {
+        if (File.Exists(path))
+        {
+            var info = new FileInfo(path);
+            double sizeMb = info.Length / (1024.0 * 1024.0);
+            return $"~{sizeMb:F1} MB";
+        }
+        return "~0.0 MB";
+    }
+
+    public string GetFileDate(string path)
+    {
+        if (File.Exists(path))
+        {
+            return File.GetLastWriteTime(path).ToString("yyyy-MM-dd");
+        }
+        return "2026-10-15";
+    }
+}
+
+@{
+    var file1Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "framework-dependency", "SiteDeploy.zip");
+    var file2Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "self-contained", "SiteDeploy.zip");
+    var file3Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "framework-dependency", "SiteDeploy.Node.zip");
+    var file4Path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "files", "self-contained", "SiteDeploy.Node.zip");
+}
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteDeploy - .NET 8 IIS Deployment Tool | License & Issue Center</title>
+    <meta name="description" content="SiteDeploy helps .NET teams automate IIS deployment, manage multi-node delivery and handle fast rollback." />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
+</head>
+<body>
+    <header class="global-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <img src="~/favicon.ico" alt="SiteDeploy Logo" class="brand-logo-img" />
+                <span>IIS Deployment Management</span>
+            </div>
+
+            <nav class="header-nav-menu">
+                <a href="#doc-section" class="nav-link active" onclick="switchMainTab('doc')">Documentation</a>
+                <a href="#license-section" class="nav-link" onclick="switchMainTab('license')">License</a>
+                <a href="#download-section" class="nav-link" onclick="switchMainTab('download')">Downloads</a>
+                <a href="#ticket-section" class="nav-link" onclick="switchMainTab('ticket')">Issue Center</a>
+            </nav>
+
+            <div class="header-right-actions">
+                <div id="user-auth-area">
+                    <button class="auth-trigger-btn" id="open-login-modal-btn">🔐 Sign In / License Center</button>
+                </div>
+                <div class="lang-bar">
+                    <button class="lang-btn" data-lang="zh" onclick="switchLanguagePage('zh')">简体中文</button>
+                    <button class="lang-btn active" data-lang="en" onclick="switchLanguagePage('en')">English</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="doc-layout-container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div id="sidebar-doc-menu" class="sidebar-group">
+                    <div class="sidebar-title">Documentation</div>
+                    <ul>
+                        <li><a href="#en-features" class="active">✨ Features</a></li>
+                        <li>
+                            <a href="#en-install">🛠️ Installation & Configuration</a>
+                            <ul class="sub-menu">
+                                <li><a href="#en-single">🖥️ 1. Single Server Deployment</a></li>
+                                <li><a href="#en-multi">🌐 2. Multi-Server Deployment</a></li>
+                                <li><a href="#en-proxy">🔄 3. Reverse Proxy Setup</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#en-usage">💡 User Guide</a>
+                            <ul class="sub-menu">
+                                <li><a href="#en-login">🔑 System Login</a></li>
+                                <li><a href="#en-perm">🛡️ Permission Management</a></li>
+                                <li><a href="#en-cases">📊 Use Cases</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="sidebar-other-menu" class="sidebar-group" style="display: none;">
+                    <div class="sidebar-title">Quick Navigation</div>
+                    <ul>
+                        <li><a href="#license-section" onclick="switchMainTab('license')">🛒 License Center</a></li>
+                        <li><a href="#download-section" onclick="switchMainTab('download')">📦 Downloads</a></li>
+                        <li><a href="#ticket-section" onclick="switchMainTab('ticket')">❓ Issue Center</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-card">
+                <div id="tab-doc" class="main-tab-content show">
+                    <h1 id="doc-section">🚀 IIS Deployment Management (SiteDeploy)</h1>
+                    <blockquote>
+                        <strong>One-line summary</strong>: An efficient operations tool for IIS automated deployment, centralized multi-server release, one-click backup, and fast version restore.
+                    </blockquote>
+
+                    <h2 id="en-features">✨ Features</h2>
+                    <ul>
+                        <li><strong>🌍 Multi-language support</strong>: Built-in Simplified Chinese and English switching for global teams.</li>
+                        <li><strong>📦 Core publishing workflow</strong>: One-click package, upload, overwrite, and IIS restart.</li>
+                        <li><strong>🌐 Multi-node coordination</strong>: Unified management for single-host and multi-server cluster deployment.</li>
+                        <li><strong>🛡️ Safety and rollback</strong>: Automated backups and rapid restore for near-instant rollback on failure.</li>
+                    </ul>
+                    <p><img src="./images/pub_1.gif" alt="Publishing Demo"></p>
+
+                    <h2 id="en-install">🛠️ Installation & Configuration</h2>
+
+                    <h3 id="en-single">🖥️ 1. Single Server Deployment (IIS Mode)</h3>
+                    <ol>
+                        <li><strong>Download and extract</strong>: Download the main-node package <code>SiteDeploy.zip</code>, then extract it to <code>C:\inetpub\wwwroot\SiteDeploy</code>.</li>
+                        <li>
+                            <strong>Configure application pool</strong>:
+                            <ul>
+                                <li>Name: <code>sitedeploy</code></li>
+                                <li>.NET CLR version: <code>No Managed Code</code></li>
+                                <li>Managed pipeline mode: <code>Integrated</code></li>
+                                <li>Advanced settings: change <strong>Identity</strong> from <code>ApplicationPoolIdentity</code> to <strong><code>LocalSystem</code></strong>.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Add website</strong>:
+                            <ul>
+                                <li>Site name: <code>SiteDeploy</code></li>
+                                <li>Application pool: select <code>sitedeploy</code></li>
+                                <li>Physical path: <code>C:\inetpub\wwwroot\SiteDeploy</code></li>
+                                <li>Port: custom (for example <code>8080</code>)</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Access and initialize</strong>:
+                            <ul>
+                                <li>URL: <code>http://localhost:8080</code></li>
+                                <li>
+                                    <strong>Login credentials</strong>:
+                                    <ul>
+                                        <li>Username: <code>admin</code></li>
+                                        <li>Initial password: check <code>admin_initial_password.txt</code> in the site root directory.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Configuration reference (<code>appsettings.json</code>)</strong>:
+                            <ul>
+                                <li><code>SystemConfig.Urls</code>: configure child-node URL addresses.</li>
+                                <li><code>SystemConfig.IpWhitelist</code>: IP allowlist for access restriction.</li>
+                                <li><code>BindUrl</code>: current site binding URL (required for Windows Service mode, optional in IIS mode).</li>
+                                <li><code>BasePath</code>: base path of the site.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="en-multi">🌐 2. Multi-Server Deployment (IIS Mode)</h3>
+                    <blockquote><strong>Prerequisite</strong>: Ensure the main node has been deployed and is running correctly.</blockquote>
+                    <ol>
+                        <li><strong>Download and extract</strong>: Download the child-node package <code>SiteDeploy.Node.zip</code>, then extract it to <code>C:\inetpub\wwwroot\SiteDeploy.Node</code>.</li>
+                        <li>
+                            <strong>Configure application pool</strong>:
+                            <ul>
+                                <li>Name: <code>sitedeploy.node</code></li>
+                                <li>.NET CLR version: <code>No Managed Code</code></li>
+                                <li>Managed pipeline mode: <code>Integrated</code></li>
+                                <li>Advanced settings: change <strong>Identity</strong> from <code>ApplicationPoolIdentity</code> to <strong><code>LocalSystem</code></strong>.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Add website</strong>:
+                            <ul>
+                                <li>Site name: <code>SiteDeploy.Node</code></li>
+                                <li>Application pool: select <code>sitedeploy.node</code></li>
+                                <li>Physical path: <code>C:\inetpub\wwwroot\SiteDeploy.Node</code></li>
+                                <li>Port: custom (for example <code>8081</code>)</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Verify child node</strong>:
+                            <p>Visit <code>http://localhost:8081</code>. If the page displays the current site URL properly, configuration is successful (child nodes do not provide a login page).</p>
+                            <p><strong>Configuration reference (<code>appsettings.json</code>)</strong>:</p>
+                            <ul>
+                                <li><code>SystemConfig.IpWhitelist</code>: IP allowlist restriction.</li>
+                                <li><code>BindUrl</code>: binding URL for Windows Service mode (optional in IIS mode).</li>
+                                <li><code>BasePath</code>: site base path.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Link to main node</strong>:
+                            <p>In main-node <code>appsettings.json</code>, add child-node URLs to <code>SystemConfig.Urls</code> (for example: <code>http://localhost:8081</code>).</p>
+                        </li>
+                    </ol>
+
+                    <h3 id="en-proxy">🔄 3. Reverse Proxy Configuration (High-Security Environments)</h3>
+                    <blockquote><strong>Best for</strong>: If your environment does not allow changing the app pool identity to <code>LocalSystem</code>, use reverse proxy mode instead.</blockquote>
+                    <ol>
+                        <li>
+                            <strong>Update configuration (<code>appsettings.json</code>)</strong>
+                            <ul>
+                                <li>Set reverse proxy bind URL <code>BindUrl</code> (for example: <code>http://127.0.0.1:5002</code>).</li>
+                                <li>Set site base path <code>BasePath</code> (for example: <code>sitedeploy</code>).</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Install and start Windows Service</strong>
+                            <p>Run the <code>install-service.bat</code> script in the root directory as Administrator.</p>
+                            <p>Make sure this URL is accessible in browser: <code>http://127.0.0.1:5002/sitedeploy</code>.</p>
+                        </li>
+                        <li>
+                            <strong>Configure IIS reverse proxy</strong>
+                            <p>Ensure IIS has reverse proxy modules installed (<strong>URL Rewrite</strong> + <strong>Application Request Routing (ARR)</strong>).</p>
+                            <p>Create an empty folder: <code>C:\inetpub\wwwroot\SiteDeploy-Proxy</code>.</p>
+                            <p>Create a new IIS site, bind a port (e.g. <code>8080</code>), and set physical path to the folder above.</p>
+                            <p>Replace the site <code>web.config</code> with:</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+  &lt;system.webServer&gt;
+    &lt;security&gt;
+      &lt;requestFiltering&gt;
+        &lt;requestLimits maxAllowedContentLength="209715200" /&gt;
+      &lt;/requestFiltering&gt;
+    &lt;/security&gt;
+    &lt;rewrite&gt;
+      &lt;rules&gt;
+        &lt;rule name="ReverseProxyInboundRule1" stopProcessing="true"&gt;
+          &lt;match url="(.*)" /&gt;
+          &lt;action type="Rewrite" url="http://127.0.0.1:5002/sitedeploy/{R:1}" /&gt;
+        &lt;/rule&gt;
+      &lt;/rules&gt;
+    &lt;/rewrite&gt;
+  &lt;/system.webServer&gt;
+&lt;/configuration&gt;</code></pre>
+                        </li>
+                        <li><strong>Access the system</strong>: Open <code>http://localhost:8080</code> in browser.</li>
+                    </ol>
+
+                    <h2 id="en-usage">💡 User Guide</h2>
+                    <h3 id="en-login">🔑 System Login</h3>
+                    <blockquote>⚠️ <strong>Note</strong>: Always log in from the main node. Child nodes do not provide login UI.</blockquote>
+                    <ul>
+                        <li><strong>Default username</strong>: <code>admin</code></li>
+                        <li><strong>Default password</strong>: in <code>admin_initial_password.txt</code> under site root directory.</li>
+                    </ul>
+
+                    <h3 id="en-perm">🛡️ Permission Management</h3>
+                    <p>After admin login, you can create sub-accounts and apply fine-grained permission control to specific servers and websites.</p>
+                    <p><strong>Example</strong>: allow <code>user1</code> to operate <code>http://localhost:5000</code> (crm-01, crm-02) and <code>http://localhost:5001</code> (app01, crm-01, crm-02).</p>
+                    <p><img src="./images/per_1.gif" alt="Permission Management"></p>
+
+                    <h3 id="en-cases">📊 Use Cases</h3>
+                    <ul>
+                        <li>
+                            <strong>Single-site Deployment</strong>
+                            <p><img src="./images/pub_2.gif" alt="Single Site Deployment"></p>
+                        </li>
+                        <li>
+                            <strong>Multi-site Coordinated Deployment</strong>
+                            <p><img src="./images/pub_3.gif" alt="Multi-site Deployment"></p>
+                        </li>
+                        <li>
+                            <strong>Fast Rollback / Restore</strong> (example with <code>http://localhost:5000</code> and <code>http://localhost:5001</code>)
+                            <p><img src="./images/pub_4.gif" alt="Version Rollback"></p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="tab-license" class="main-tab-content" style="display: none;">
+                    <h1 id="license-section">🛒 License Center</h1>
+                    <p>Buy and manage deployment licenses online.</p>
+
+                    <div id="license-unpurchased-view">
+                        <div class="license-notice-box">
+                            <h3>⚠️ No active license was found for current account.</h3>
+                            <p>Please complete payment with one of the following options.</p>
+                        </div>
+
+                        <div class="payment-methods-grid">
+                            <div class="pay-card">
+                                <div class="pay-icon">💚</div>
+                                <h3>WeChat Pay</h3>
+                                <p class="pay-desc">For users in mainland China.</p>
+                                <div class="qrcode-box">[ WeChat QR ]</div>
+                            </div>
+                            <div class="pay-card">
+                                <div class="pay-icon">💙</div>
+                                <h3>Alipay</h3>
+                                <p class="pay-desc">Supports credit card and balance.</p>
+                                <div class="qrcode-box">[ Alipay QR ]</div>
+                            </div>
+                            <div class="pay-card">
+                                <div class="pay-icon">🍋</div>
+                                <h3>LemonSqueezy</h3>
+                                <p class="pay-desc">Global credit card / PayPal.</p>
+                                <a class="lemonsqueezy-button pay-external-btn"
+                                   href="https://site-deploy.lemonsqueezy.com/checkout/buy/899682be-5149-474d-9860-3731e8870c3e?embed=1">
+                                    Buy SiteDeploy License
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="user-purchased-dashboard" style="display: none;">
+                        <div class="user-profile-bar">
+                            <span>Current account: <strong id="dashboard-user-email"></strong></span>
+                            <button onclick="logoutUser()" class="logout-action-btn">Sign out</button>
+                        </div>
+                        <h3 style="margin-top: 20px; margin-bottom: 12px;">📦 Purchased Licenses</h3>
+                        <div class="license-table-container">
+                            <table class="license-table">
+                                <thead>
+                                    <tr>
+                                        <th>License Name</th>
+                                        <th>Account</th>
+                                        <th>Purchased At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchased-license-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-download" class="main-tab-content" style="display: none;">
+                    <h2 id="download-section">📦 Download Center</h2>
+                    <p>Target Runtime: <code>win-x64</code> | Target Framework: <code>.net8.0</code> | <span style="color: var(--primary-color);">Latest: v1.2.0</span></p>
+
+                    <div class="download-grid">
+                        <div class="download-card">
+                            <h3>1. SiteDeploy Main Node (Framework-dependent)</h3>
+                            <p class="download-desc">For Windows servers that already have .NET 8 runtime.</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | .net8.0</span>
+                                <span class="file-size">📦 @GetFileSize(file1Path) | 📅 @GetFileDate(file1Path)</span>
+                            </div>
+                            <a href="files/framework-dependency/SiteDeploy.zip" class="download-btn">⬇️ Download SiteDeploy.zip</a>
+                        </div>
+                        <div class="download-card">
+                            <h3>2. SiteDeploy Main Node (Self-contained)</h3>
+                            <p class="download-desc">Includes runtime. No separate .NET installation needed.</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | Self-contained</span>
+                                <span class="file-size">📦 @GetFileSize(file2Path) | 📅 @GetFileDate(file2Path)</span>
+                            </div>
+                            <a href="files/self-contained/SiteDeploy.zip" class="download-btn">⬇️ Download SiteDeploy.zip</a>
+                        </div>
+                        <div class="download-card">
+                            <h3>3. SiteDeploy Node (Framework-dependent)</h3>
+                            <p class="download-desc">For multi-node deployment with preinstalled .NET 8 runtime.</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | .net8.0</span>
+                                <span class="file-size">📦 @GetFileSize(file3Path) | 📅 @GetFileDate(file3Path)</span>
+                            </div>
+                            <a href="files/framework-dependency/SiteDeploy.Node.zip" class="download-btn">⬇️ Download SiteDeploy.Node.zip</a>
+                        </div>
+                        <div class="download-card">
+                            <h3>4. SiteDeploy Node (Self-contained)</h3>
+                            <p class="download-desc">Includes runtime and can run in clean environment quickly.</p>
+                            <div class="download-meta">
+                                <span class="badge-runtime">win-x64 | Self-contained</span>
+                                <span class="file-size">📦 @GetFileSize(file4Path) | 📅 @GetFileDate(file4Path)</span>
+                            </div>
+                            <a href="files/self-contained/SiteDeploy.Node.zip" class="download-btn">⬇️ Download SiteDeploy.Node.zip</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-ticket" class="main-tab-content" style="display: none;">
+                    <h2 id="ticket-section">❓ Issue Center</h2>
+                    <p>Submit technical questions for deployment, reverse proxy, or license activation.</p>
+
+                    <div class="ticket-action-bar">
+                        <button class="submit-login-btn" style="width: auto; padding: 8px 18px;" onclick="openNewTicketModal()">➕ New Issue</button>
+                    </div>
+
+                    <div class="license-table-container" style="margin-top: 16px;">
+                        <table class="license-table">
+                            <thead>
+                                <tr>
+                                    <th>Issue ID</th>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Updated At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticket-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🔐 Sign In / License Center</h3>
+                <button class="modal-close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="login-form-wrapper">
+                    <p class="modal-tip">Sign in with your work email and verification code.</p>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="input-with-btn">
+                            <input type="email" id="user-email-input" placeholder="name@example.com" />
+                            <button id="send-code-btn" type="button" onclick="sendVerifyCode()">Send Code</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Verification Code</label>
+                        <input type="text" id="verify-code-input" placeholder="6-digit code" />
+                    </div>
+                    <button id="login-btn" class="submit-login-btn" onclick="submitLogin()">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="new-ticket-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>➕ New Issue</h3>
+                <button class="modal-close-btn" onclick="closeNewTicketModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Issue Description</label>
+                    <textarea id="new-ticket-content" class="modal-textarea" placeholder="Describe your issue in detail"></textarea>
+                </div>
+                <button id="new-ticket-submit-btn" class="submit-login-btn" onclick="submitNewTicket()">Submit Issue</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ticket-detail-modal">
+        <div class="modal-container modal-container-lg">
+            <div class="modal-header">
+                <h3>🧾 Issue Detail</h3>
+                <button class="modal-close-btn" onclick="closeTicketDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-detail-meta">
+                    <span>Issue ID: <strong id="ticket-detail-id"></strong></span>
+                    <span>User: <strong id="ticket-detail-email"></strong></span>
+                    <span>Status: <strong id="ticket-detail-status"></strong></span>
+                </div>
+                <div id="ticket-message-list" class="ticket-message-list"></div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>Reply</label>
+                    <textarea id="ticket-reply-content" class="modal-textarea" placeholder="Type your reply"></textarea>
+                </div>
+                <button id="ticket-reply-btn" class="submit-login-btn" onclick="submitTicketReply()">Submit Reply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchMainTab(tabName) {
+            document.querySelectorAll('.main-tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.header-nav-menu .nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-group').forEach(el => el.style.display = 'none');
+
+            if (tabName === 'doc') {
+                document.getElementById('tab-doc').style.display = 'block';
+                document.getElementById('sidebar-doc-menu').style.display = 'block';
+            } else if (tabName === 'license') {
+                document.getElementById('tab-license').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+                checkLoginStatusForLicenseView();
+            } else if (tabName === 'download') {
+                document.getElementById('tab-download').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+            } else if (tabName === 'ticket') {
+                document.getElementById('tab-ticket').style.display = 'block';
+                document.getElementById('sidebar-other-menu').style.display = 'block';
+            }
+
+            const activeNav = Array.from(document.querySelectorAll('.header-nav-menu .nav-link')).find(a => a.getAttribute('onclick').includes(tabName));
+            if (activeNav) activeNav.classList.add('active');
+        }
+
+        function switchLanguagePage(lang) {
+            if (lang === 'zh') {
+                window.location.href = '/';
+                return;
+            }
+
+            window.location.href = '/en';
+        }
+
+        const loginModal = document.getElementById('login-modal');
+        const newTicketModal = document.getElementById('new-ticket-modal');
+        const ticketDetailModal = document.getElementById('ticket-detail-modal');
+        let currentTicketId = '';
+
+        document.getElementById('open-login-modal-btn').onclick = () => loginModal.classList.add('show');
+        function closeLoginModal() { loginModal.classList.remove('show'); }
+        function closeNewTicketModal() { newTicketModal.classList.remove('show'); }
+        function closeTicketDetailModal() { ticketDetailModal.classList.remove('show'); }
+
+        function setButtonLoading(button, loadingText, normalText, isLoading) {
+            if (!button) {
+                return;
+            }
+
+            button.disabled = isLoading;
+            button.dataset.normalText = button.dataset.normalText || normalText;
+            button.textContent = isLoading ? loadingText : (button.dataset.normalText || normalText);
+        }
+
+        async function sendVerifyCode() {
+            const email = document.getElementById('user-email-input').value.trim();
+            const sendCodeBtn = document.getElementById('send-code-btn');
+
+            if (!email || !email.includes('@@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            setButtonLoading(sendCodeBtn, 'Sending...', 'Send Code', true);
+
+            try {
+                const resp = await fetch('/send-verification-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || 'Failed to send verification code');
+                    return;
+                }
+
+                alert(data.message || 'Code sent');
+            } catch (error) {
+                alert('Network error, please retry later');
+            } finally {
+                setButtonLoading(sendCodeBtn, 'Sending...', 'Send Code', false);
+            }
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('user-email-input').value.trim();
+            const code = document.getElementById('verify-code-input').value.trim();
+            const loginBtn = document.getElementById('login-btn');
+
+            if (!email || !code) {
+                alert('Please enter email and verification code');
+                return;
+            }
+
+            setButtonLoading(loginBtn, 'Signing in...', 'Sign In', true);
+
+            try {
+                const resp = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || 'Sign in failed');
+                    return;
+                }
+
+                closeLoginModal();
+                updateUIAfterLogin(data.email);
+                await checkLoginStatusForLicenseView();
+                await loadTicketList();
+                switchMainTab('license');
+            } catch (error) {
+                alert('Network error, please retry later');
+            } finally {
+                setButtonLoading(loginBtn, 'Signing in...', 'Sign In', false);
+            }
+        }
+
+        async function logoutUser() {
+            await fetch('/logout');
+            location.reload();
+        }
+
+        function updateUIAfterLogin(email) {
+            document.getElementById('user-auth-area').innerHTML =
+                `<div style="display:flex; gap:8px; align-items:center;">
+                    <button class="auth-trigger-btn logged" onclick="switchMainTab('license')">👤 ${email}</button>
+                    <button class="logout-action-btn" onclick="logoutUser()">Sign out</button>
+                </div>`;
+        }
+
+        async function checkLoginStatusForLicenseView() {
+            const authResp = await fetch('/auth/status');
+            if (!authResp.ok) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            const auth = await authResp.json();
+            if (!auth.isAuthenticated) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            updateUIAfterLogin(auth.email);
+            const listResp = await fetch('/license/list');
+            const list = listResp.ok ? await listResp.json() : [];
+            const tbody = document.getElementById('purchased-license-tbody');
+
+            if (!list.length) {
+                document.getElementById('license-unpurchased-view').style.display = 'block';
+                document.getElementById('user-purchased-dashboard').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('license-unpurchased-view').style.display = 'none';
+            document.getElementById('user-purchased-dashboard').style.display = 'block';
+            document.getElementById('dashboard-user-email').textContent = auth.email;
+
+            tbody.innerHTML = list.map(x => `
+                <tr>
+                    <td><strong>Order #${x.orderNumber}</strong></td>
+                    <td>${x.customerEmail}</td>
+                    <td>${new Date(x.createdAt).toLocaleString()}</td>
+                    <td><button class="dl-lic-btn" onclick="alert('Connect real download API here')">Download License</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadTicketList() {
+            const resp = await fetch('/ticket/list');
+            if (!resp.ok) {
+                document.getElementById('ticket-tbody').innerHTML = `<tr><td colspan="5">Please sign in to view issues</td></tr>`;
+                return;
+            }
+
+            const list = await resp.json();
+            const tbody = document.getElementById('ticket-tbody');
+
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="5">No issues yet. Click "New Issue" to create one.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(x => `
+                <tr>
+                    <td>#${x.id}</td>
+                    <td>${x.email}</td>
+                    <td>${x.status}</td>
+                    <td>${new Date(x.updatedAt).toLocaleString()}</td>
+                    <td><button class="dl-lic-btn" onclick="viewTicketDetail('${x.id}')">View</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function openNewTicketModal() {
+            const authResp = await fetch('/auth/status');
+            if (!authResp.ok) {
+                alert('Please sign in first');
+                return;
+            }
+
+            const auth = await authResp.json();
+            if (!auth.isAuthenticated) {
+                alert('Please sign in first');
+                return;
+            }
+
+            document.getElementById('new-ticket-content').value = '';
+            newTicketModal.classList.add('show');
+        }
+
+        async function submitNewTicket() {
+            const content = document.getElementById('new-ticket-content').value.trim();
+            const submitBtn = document.getElementById('new-ticket-submit-btn');
+
+            if (!content) {
+                alert('Please enter issue description');
+                return;
+            }
+
+            setButtonLoading(submitBtn, 'Submitting...', 'Submit Issue', true);
+
+            try {
+                const resp = await fetch('/ticket/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || 'Create failed');
+                    return;
+                }
+
+                closeNewTicketModal();
+                await loadTicketList();
+                await viewTicketDetail(data.ticketId);
+            } catch (error) {
+                alert('Network error, please retry later');
+            } finally {
+                setButtonLoading(submitBtn, 'Submitting...', 'Submit Issue', false);
+            }
+        }
+
+        async function viewTicketDetail(id) {
+            const resp = await fetch(`/ticket/${id}`);
+            const data = await resp.json();
+            if (!resp.ok) {
+                alert(data.message || 'Failed to load issue detail');
+                return;
+            }
+
+            currentTicketId = id;
+            document.getElementById('ticket-detail-id').textContent = `#${id}`;
+            document.getElementById('ticket-detail-email').textContent = data.email;
+            document.getElementById('ticket-detail-status').textContent = data.status;
+            document.getElementById('ticket-reply-content').value = '';
+
+            const messageList = document.getElementById('ticket-message-list');
+            if (!data.messages || !data.messages.length) {
+                messageList.innerHTML = '<div class="ticket-message-empty">No messages yet</div>';
+            } else {
+                messageList.innerHTML = data.messages.map(x => `
+                    <div class="ticket-message-item ${x.senderType === 'User' ? 'user' : 'admin'}">
+                        <div class="ticket-message-meta">${x.senderType} · ${new Date(x.createAt).toLocaleString()}</div>
+                        <div class="ticket-message-content">${x.content}</div>
+                    </div>
+                `).join('');
+            }
+
+            ticketDetailModal.classList.add('show');
+        }
+
+        async function submitTicketReply() {
+            const content = document.getElementById('ticket-reply-content').value.trim();
+            const replyBtn = document.getElementById('ticket-reply-btn');
+
+            if (!currentTicketId) {
+                return;
+            }
+
+            if (!content) {
+                alert('Please enter reply content');
+                return;
+            }
+
+            setButtonLoading(replyBtn, 'Submitting...', 'Submit Reply', true);
+
+            try {
+                const resp = await fetch(`/ticket/${currentTicketId}/reply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.message || 'Submit failed');
+                    return;
+                }
+
+                await viewTicketDetail(currentTicketId);
+                await loadTicketList();
+            } catch (error) {
+                alert('Network error, please retry later');
+            } finally {
+                setButtonLoading(replyBtn, 'Submitting...', 'Submit Reply', false);
+            }
+        }
+
+        window.onload = async () => {
+            await checkLoginStatusForLicenseView();
+            await loadTicketList();
+        };
+    </script>
+</body>
+</html>
