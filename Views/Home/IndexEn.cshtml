@@ -640,9 +640,18 @@
                     <td><strong>Order #${x.orderNumber}</strong></td>
                     <td>${x.customerEmail}</td>
                     <td>${new Date(x.createdAt).toLocaleString()}</td>
-                    <td><button class="dl-lic-btn" onclick="alert('Connect real download API here')">Download License</button></td>
+                    <td><button class="dl-lic-btn" onclick="downloadLicense('${x.orderId}')">Download License</button></td>
                 </tr>
             `).join('');
+        }
+
+        function downloadLicense(orderId) {
+            if (!orderId) {
+                alert('Invalid order ID');
+                return;
+            }
+
+            window.location.href = `/api/Download/downloadLicense/${encodeURIComponent(orderId)}`;
         }
 
         async function loadTicketList() {

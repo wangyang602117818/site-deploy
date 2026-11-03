@@ -688,9 +688,18 @@
                     <td><strong>Order #${x.orderNumber}</strong></td>
                     <td>${x.customerEmail}</td>
                     <td>${new Date(x.createdAt).toLocaleString()}</td>
-                    <td><button class="dl-lic-btn" onclick="alert('可接入真实下载接口')">下载 License</button></td>
+                    <td><button class="dl-lic-btn" onclick="downloadLicense('${x.orderId}')">下载 License</button></td>
                 </tr>
             `).join('');
+        }
+
+        function downloadLicense(orderId) {
+            if (!orderId) {
+                alert('订单号无效');
+                return;
+            }
+
+            window.location.href = `/api/Download/downloadLicense/${encodeURIComponent(orderId)}`;
         }
 
         async function loadTicketList() {

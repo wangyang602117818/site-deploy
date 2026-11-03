@@ -151,6 +151,7 @@ namespace SiteDeploy.Document.Controllers
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => new
                 {
+                    x.OrderId,
                     x.OrderNumber,
                     x.CustomerEmail,
                     x.CreatedAt
