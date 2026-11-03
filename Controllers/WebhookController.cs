@@ -39,7 +39,7 @@ namespace SiteDeploy.Document.Controllers
             // 为了业务解析，再转成字符串用于json解析
             string payload = System.Text.Encoding.UTF8.GetString(rawBodyBytes);
             var signatureHeader = Request.Headers["x-signature"].FirstOrDefault();
-            
+
             if (!_env.IsDevelopment())
             {
                 // 传入原始字节数组验签！
@@ -74,13 +74,17 @@ namespace SiteDeploy.Document.Controllers
                 RawPayload = payload,
                 CreatedAt = DateTime.UtcNow
             };
-            var user = new User
-            {
-                Email = lsOrder.CustomerEmail,
-            };
 
+            var user = _dbContext.Users.Where(w => w.Email == lsOrder.CustomerEmail).FirstOrDefault();
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = lsOrder.CustomerEmail,
+                };
+                _dbContext.Users.Add(user);
+            }
             _dbContext.LsOrders.Add(lsOrder);
-            _dbContext.Users.Add(user);
 
             await _dbContext.SaveChangesAsync();
 
