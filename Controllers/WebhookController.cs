@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 using Serilog;
 using SiteDeploy.Document.DBContext;
 using SiteDeploy.Document.Models;
@@ -15,12 +16,13 @@ namespace SiteDeploy.Document.Controllers
     public class WebhookController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
-        private readonly string _lsWebhookSecret;
+        private readonly string? _lsWebhookSecret;
         private readonly IWebHostEnvironment _env;
         public WebhookController(AppDbContext dbContext, IConfiguration configuration, IWebHostEnvironment env)
         {
             _dbContext = dbContext;
-            _lsWebhookSecret = configuration["LemonSqueezySecret"]!;
+            _lsWebhookSecret = Environment.GetEnvironmentVariable("LemonSqueezySecret");
+            if (string.IsNullOrEmpty(_lsWebhookSecret)) _lsWebhookSecret = configuration["LemonSqueezySecret"]!;
             _env = env;
         }
         [HttpPost("lemonsqueezy")]
