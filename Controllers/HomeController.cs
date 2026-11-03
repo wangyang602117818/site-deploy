@@ -43,7 +43,7 @@ namespace SiteDeploy.Document.Controllers
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
             {
-                return BadRequest(new { message = "邮箱不能为空" });
+                return BadRequest(new { message = "Email is required" });
             }
 
             var email = dto.Email.Trim().ToLowerInvariant();
@@ -65,7 +65,7 @@ namespace SiteDeploy.Document.Controllers
             await _emailHelper.SendLicenseEmailAsync(email, email, authCode);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new { message = "验证码已发送，有效期 10 分钟" });
+            return Ok(new { message = "Verification code sent. It is valid for 10 minutes." });
         }
 
         [HttpPost("login")]
@@ -73,7 +73,7 @@ namespace SiteDeploy.Document.Controllers
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Code))
             {
-                return BadRequest(new { message = "邮箱和验证码不能为空" });
+                return BadRequest(new { message = "Email and verification code are required" });
             }
 
             var email = dto.Email.Trim().ToLowerInvariant();
@@ -82,17 +82,17 @@ namespace SiteDeploy.Document.Controllers
             var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
             if (user == null)
             {
-                return BadRequest(new { message = "用户不存在，请先获取验证码" });
+                return BadRequest(new { message = "User not found. Please request a verification code first." });
             }
 
             if (string.IsNullOrWhiteSpace(user.AuthCode) || user.AuthExpireAt == null || user.AuthExpireAt < DateTime.UtcNow)
             {
-                return BadRequest(new { message = "验证码已失效，请重新获取" });
+                return BadRequest(new { message = "Verification code has expired. Please request a new one." });
             }
 
             if (!string.Equals(user.AuthCode, code, StringComparison.Ordinal))
             {
-                return BadRequest(new { message = "验证码错误" });
+                return BadRequest(new { message = "Invalid verification code" });
             }
 
             var claims = new List<Claim>
@@ -122,7 +122,7 @@ namespace SiteDeploy.Document.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok(new { message = "已退出登录" });
+            return Ok(new { message = "Signed out successfully" });
         }
         [Authorize]
         [HttpGet("auth/status")]
@@ -193,7 +193,7 @@ namespace SiteDeploy.Document.Controllers
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Content))
             {
-                return BadRequest(new { message = "问题内容不能为空" });
+                return BadRequest(new { message = "Issue content is required" });
             }
 
             var email = User.Identity?.Name;
@@ -242,7 +242,7 @@ namespace SiteDeploy.Document.Controllers
             var work = await _dbContext.Works.FirstOrDefaultAsync(x => x.Id == id && (isAdmin || x.Email == email));
             if (work == null)
             {
-                return NotFound(new { message = "工单不存在" });
+                return NotFound(new { message = "Issue not found" });
             }
 
             var messages = await _dbContext.WorkMessages
@@ -273,7 +273,7 @@ namespace SiteDeploy.Document.Controllers
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Content))
             {
-                return BadRequest(new { message = "回复内容不能为空" });
+                return BadRequest(new { message = "Reply content is required" });
             }
 
             var email = User.Identity?.Name;
@@ -287,7 +287,7 @@ namespace SiteDeploy.Document.Controllers
             var work = await _dbContext.Works.FirstOrDefaultAsync(x => x.Id == id && (isAdmin || x.Email == email));
             if (work == null)
             {
-                return NotFound(new { message = "工单不存在" });
+                return NotFound(new { message = "Issue not found" });
             }
 
             _dbContext.WorkMessages.Add(new WorkMessage
@@ -301,7 +301,7 @@ namespace SiteDeploy.Document.Controllers
             work.UpdatedAt = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new { message = "回复已提交" });
+            return Ok(new { message = "Reply submitted" });
         }
 
         [Authorize]

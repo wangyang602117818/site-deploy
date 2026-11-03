@@ -20,7 +20,7 @@ namespace SiteDeploy.Document.Controllers
             // 限制子目录防止越权
             if (subFolder != "framework-dependency" && subFolder != "self-contained")
             {
-                return BadRequest(new { code = 400, message = "非法的目录参数" });
+                return BadRequest(new { code = 400, message = "Invalid directory parameter" });
             }
 
             var safeFileName = Path.GetFileName(fileName);
@@ -28,7 +28,7 @@ namespace SiteDeploy.Document.Controllers
 
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound(new { code = 404, message = $"文件 {safeFileName} 不存在。" });
+                return NotFound(new { code = 404, message = $"File {safeFileName} does not exist." });
             }
 
             var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
