@@ -137,7 +137,12 @@
                         <li><strong>🌐 多机协同</strong>：支持单机或多服务器集群统一管理与分发部署。</li>
                         <li><strong>🛡️ 安全保障</strong>：内置自动化备份与快速版本还原机制，发布失败秒级回滚。</li>
                     </ul>
-                    <p><img src="./images/pub_1.gif" alt="发布演示"></p>
+                    <p>
+                        <video controls="controls" class="video">
+                            <source src="~/images/pub_1.mp4" type="video/mp4" />
+                        </video>
+                        @* <img src="./images/pub_1.gif" alt="发布演示"> *@
+                    </p>
 
                     <h2 id="zh-install">🛠️ 安装与配置</h2>
 
@@ -278,23 +283,39 @@
                     <h3 id="zh-perm">🛡️ 权限管理</h3>
                     <p>管理员登录后可创建子用户，并支持精细化权限控制，指定用户可操作的服务器及具体站点。</p>
                     <p><strong>配置示例</strong>：允许 <code>user1</code> 操作 <code>http://localhost:5000</code>（crm‑01, crm‑02 站点）以及 <code>http://localhost:5001</code>（app01, crm‑01, crm‑02 站点）。</p>
-                    <p><img src="./images/per_1.gif" alt="权限管理配置"></p>
+                    <p>
+                        <video controls="controls" class="video">
+                            <source src="~/images/per_1.mp4" type="video/mp4" />
+                        </video>
+                        @* <img src="./images/per_1.gif" alt="权限管理配置"></p> *@
 
-                    <h3 id="zh-cases">📊 使用案例</h3>
-                    <ul>
-                        <li>
-                            <strong>单站点发布</strong>
-                            <p><img src="./images/pub_2.gif" alt="单站点发布"></p>
-                        </li>
-                        <li>
-                            <strong>多站点协同发布</strong>
-                            <p><img src="./images/pub_3.gif" alt="多站点发布"></p>
-                        </li>
-                        <li>
-                            <strong>版本快速回滚/还原</strong>（以 <code>http://localhost:5000</code> 和 <code>http://localhost:5001</code> 为例）
-                            <p><img src="./images/pub_4.gif" alt="版本还原"></p>
-                        </li>
-                    </ul>
+                        <h3 id="zh-cases">📊 使用案例</h3>
+                        <ul>
+                            <li>
+                                <strong>单站点发布</strong>
+                                <p>
+                                    <video controls="controls" class="video">
+                                        <source src="~/images/pub_2.mp4" type="video/mp4" />
+                                    </video>
+                                    @* <img src="./images/pub_2.gif" alt="单站点发布"></p> *@
+                            </li>
+                            <li>
+                                <strong>多站点协同发布</strong>
+                                <p>
+                                    <video controls="controls" class="video">
+                                        <source src="~/images/pub_3.mp4" type="video/mp4" />
+                                    </video>
+                                    @* <img src="./images/pub_3.gif" alt="多站点发布"></p> *@
+                            </li>
+                            <li>
+                                <strong>版本快速回滚/还原</strong>（以 <code>http://localhost:5000</code> 和 <code>http://localhost:5001</code> 为例）
+                                <p>
+                                    <video controls="controls" class="video">
+                                        <source src="~/images/pub_4.mp4" type="video/mp4" />
+                                    </video>
+                                    @* <img src="./images/pub_4.gif" alt="版本还原"></p> *@
+                            </li>
+                        </ul>
                 </div>
 
                 <!-- 标签页 2：购买 License 模块 -->
@@ -509,7 +530,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 前端交互 JavaScript 脚本 -->
     <script>
         // 切换顶部主菜单 Tab
@@ -519,7 +540,7 @@
             document.querySelectorAll('.sidebar-group').forEach(el => el.style.display = 'none');
 
             if (tabName === 'doc') {
-                document.getElementById('tab-doc').style.display = 'block'; 
+                document.getElementById('tab-doc').style.display = 'block';
                 document.getElementById('sidebar-doc-menu').style.display = 'block';
             } else if (tabName === 'license') {
                 document.getElementById('tab-license').style.display = 'block';
