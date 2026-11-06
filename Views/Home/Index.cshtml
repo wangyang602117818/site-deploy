@@ -557,6 +557,32 @@
             // 高亮对应的顶部链接
             const activeNav = Array.from(document.querySelectorAll('.header-nav-menu .nav-link')).find(a => a.getAttribute('onclick').includes(tabName));
             if (activeNav) activeNav.classList.add('active');
+
+            ensureSidebarActive();
+        }
+
+        function ensureSidebarActive() {
+            const visibleGroup = Array.from(document.querySelectorAll('.sidebar-group')).find(el => el.style.display !== 'none');
+            if (!visibleGroup) {
+                return;
+            }
+
+            const hasActive = visibleGroup.querySelector('a.active');
+            if (!hasActive) {
+                const firstLink = visibleGroup.querySelector('a');
+                if (firstLink) {
+                    firstLink.classList.add('active');
+                }
+            }
+        }
+
+        function bindSidebarActiveEvents() {
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.querySelectorAll('.sidebar-nav a').forEach(x => x.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
         }
 
         function switchLanguagePage(lang) {
@@ -867,6 +893,8 @@
         }
 
         window.onload = async () => {
+            bindSidebarActiveEvents();
+            ensureSidebarActive();
             await checkLoginStatusForLicenseView();
             await loadTicketList();
         };
