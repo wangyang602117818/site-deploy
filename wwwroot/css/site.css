@@ -163,7 +163,6 @@ button.lang-btn {
     color: #94a3b8;
     letter-spacing: 0.08em;
     margin-bottom: 16px;
-    padding-left: 10px;
 }
 
 .sidebar-nav ul {
@@ -286,9 +285,13 @@ ul, ol {
     font-size: 14.5px;
 }
 
-li {
-    margin: 5px 0;
+.sidebar-group ul, ol {
+    padding-left: 0px;
 }
+
+    li {
+        margin: 5px 0;
+    }
 
 img {
     max-width: 100%;
