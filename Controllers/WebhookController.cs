@@ -16,15 +16,17 @@ namespace SiteDeploy.Document.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly string? _lsWebhookSecret;
-        private readonly string? _dodopaymentsKey;
+        private readonly string? _dodopaymentsSecret;  
+        //private readonly string? _dodopaymentsApiKey;
         private readonly IWebHostEnvironment _env;
         public WebhookController(AppDbContext dbContext, IConfiguration configuration, IWebHostEnvironment env)
         {
             _dbContext = dbContext;
             _lsWebhookSecret = Environment.GetEnvironmentVariable("LemonSqueezySecret");
             if (string.IsNullOrEmpty(_lsWebhookSecret)) _lsWebhookSecret = configuration["LemonSqueezySecret"]!;
-            _dodopaymentsKey = Environment.GetEnvironmentVariable("DodoPaymentsKey");
-            if (string.IsNullOrEmpty(_dodopaymentsKey)) _dodopaymentsKey = configuration["DodoPaymentsKey"]!;
+            _dodopaymentsSecret = Environment.GetEnvironmentVariable("DodoPaymentsSecret");
+            if (string.IsNullOrEmpty(_dodopaymentsSecret)) _dodopaymentsSecret = configuration["DodoPaymentsSecret"]!;
+                    
             _env = env;
         }
         [HttpPost("lemonsqueezy")]
@@ -114,7 +116,7 @@ namespace SiteDeploy.Document.Controllers
                 string eventType = string.Empty;
                 if (!_env.IsDevelopment())
                 {
-                    if (!VerifyDodoPaymentsSignature(headers, rawBody, _dodopaymentsKey))
+                    if (!VerifyDodoPaymentsSignature(headers, rawBody, _dodopaymentsSecret))
                     {
                         Serilog.Log.Warning("Dodo signature verify fail");
                         return Unauthorized("Webhook signature verification failed");
