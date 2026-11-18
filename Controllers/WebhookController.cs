@@ -234,11 +234,12 @@ namespace SiteDeploy.Document.Controllers
                 ? "https://live.dodopayments.com/checkouts"
                 : "https://test.dodopayments.com/checkouts";
 
+            string product_id = _env.IsDevelopment() ? "pdt_0Ns8DDS4JGU5Cub6l9shb" : "pdt_0NsCGAr6GwFgQRjUYPVf8";
             var requestBody = new
             {
                 product_cart = new List<object>
                 {
-                    new { product_id = "pdt_0Ns8DDS4JGU5Cub6l9shb", quantity = 1 }
+                    new { product_id = product_id, quantity = 1 }
                 },
                 success_redirect_url = "https://site-deploy-0lgd.onrender.com",
                 cancel_redirect_url = "https://site-deploy-0lgd.onrender.com",
