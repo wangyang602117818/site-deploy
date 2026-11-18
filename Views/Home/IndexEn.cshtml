@@ -36,7 +36,7 @@
     <title>SiteDeploy - .NET 8 IIS Deployment Tool | License & Issue Center</title>
     <meta name="description" content="SiteDeploy helps .NET teams automate IIS deployment, manage multi-node delivery and handle fast rollback." />
     <link href="~/css/site.css" rel="stylesheet" />
-    <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dodopayments-checkout@latest/dist/index.js"></script>
 </head>
 <body>
     <header class="global-header">
@@ -321,11 +321,10 @@
                                 <div class="qrcode-box">[ Alipay QR ]</div>
                             </div> *@
                             <div class="pay-card">
-                                <div class="pay-icon">🍋</div>
-                                <h3>LemonSqueezy</h3>
+                                <div class="pay-icon">💳</div>
+                                <h3>DodoPayments</h3>
                                 <p class="pay-desc">Global credit card / PayPal.</p>
-                                <a class="lemonsqueezy-button pay-external-btn"
-                                   href="https://site-deploy.lemonsqueezy.com/checkout/buy/899682be-5149-474d-9860-3731e8870c3e?embed=1">
+                                <a class="dodo-pay-btn pay-external-btn">
                                     Buy SiteDeploy License
                                 </a>
                             </div>
@@ -842,6 +841,47 @@
                 setButtonLoading(replyBtn, 'Submitting...', 'Submit Reply', false);
             }
         }
+
+        // 初始化全局一次，mode 上线改成 live
+        DodoPaymentsCheckout.DodoPayments.Initialize({
+            mode: "test",
+            displayType: "overlay",
+            onEvent: (evt) => {
+                console.log("Dodo事件：", evt);
+                if (evt.event_type === "checkout.opened") {
+                    console.log("支付弹窗打开");
+                }
+                if (evt.event_type === "checkout.closed") {
+                    console.log("弹窗关闭");
+                }
+                if (evt.event_type === "checkout.error") {
+                    alert("支付弹窗出错：" + evt.data?.message);
+                }
+            }
+        });
+
+        document.querySelector('.dodo-pay-btn').addEventListener('click', async function () {
+            try {
+                const res = await fetch("api/webhook/dodo/create-session", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                const json = await res.json();
+                if (!json.checkoutUrl) {
+                    alert("创建支付会话失败");
+                    return;
+                }
+                // 打开弹窗
+                DodoPaymentsCheckout.DodoPayments.Checkout.open({
+                    checkoutUrl: json.checkoutUrl
+                });
+            } catch (err) {
+                console.error(err);
+                alert("网络异常，无法拉起支付");
+            }
+        })
 
         window.onload = async () => {
             bindSidebarActiveEvents();

@@ -16,17 +16,18 @@ namespace SiteDeploy.Document.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly string? _lsWebhookSecret;
-        private readonly string? _dodopaymentsSecret;  
-        //private readonly string? _dodopaymentsApiKey;
+        private readonly string? _dodoPaymentsSecret;
+        private readonly string? _dodoPaymentsApiKey;
         private readonly IWebHostEnvironment _env;
         public WebhookController(AppDbContext dbContext, IConfiguration configuration, IWebHostEnvironment env)
         {
             _dbContext = dbContext;
             _lsWebhookSecret = Environment.GetEnvironmentVariable("LemonSqueezySecret");
             if (string.IsNullOrEmpty(_lsWebhookSecret)) _lsWebhookSecret = configuration["LemonSqueezySecret"]!;
-            _dodopaymentsSecret = Environment.GetEnvironmentVariable("DodoPaymentsSecret");
-            if (string.IsNullOrEmpty(_dodopaymentsSecret)) _dodopaymentsSecret = configuration["DodoPaymentsSecret"]!;
-                    
+            _dodoPaymentsSecret = Environment.GetEnvironmentVariable("DodoPaymentsSecret");
+            if (string.IsNullOrEmpty(_dodoPaymentsSecret)) _dodoPaymentsSecret = configuration["DodoPaymentsSecret"]!;
+            _dodoPaymentsApiKey = Environment.GetEnvironmentVariable("DodoPaymentsApiKey");
+            if (string.IsNullOrEmpty(_dodoPaymentsApiKey)) _dodoPaymentsApiKey = configuration["DodoPaymentsApiKey"]!;
             _env = env;
         }
         [HttpPost("lemonsqueezy")]
@@ -116,7 +117,7 @@ namespace SiteDeploy.Document.Controllers
                 string eventType = string.Empty;
                 if (!_env.IsDevelopment())
                 {
-                    if (!VerifyDodoPaymentsSignature(headers, rawBody, _dodopaymentsSecret))
+                    if (!VerifyDodoPaymentsSignature(headers, rawBody, _dodoPaymentsSecret))
                     {
                         Serilog.Log.Warning("Dodo signature verify fail");
                         return Unauthorized("Webhook signature verification failed");
@@ -225,6 +226,54 @@ namespace SiteDeploy.Document.Controllers
                 return StatusCode(500, "Webhook process failed");
             }
         }
+        [HttpPost("dodo/create-session")]
+        public async Task<IActionResult> CreateDodoSession()
+        {
+            bool isLive = _env.IsDevelopment() ? false : true;
+            string apiUrl = isLive
+                ? "https://live.dodopayments.com/checkouts"
+                : "https://test.dodopayments.com/checkouts";
+
+            var requestBody = new
+            {
+                product_cart = new List<object>
+                {
+                    new { product_id = "pdt_0Ns8DDS4JGU5Cub6l9shb", quantity = 1 }
+                },
+                success_redirect_url = "https://site-deploy-0lgd.onrender.com",
+                cancel_redirect_url = "https://site-deploy-0lgd.onrender.com",
+                metadata = new Dictionary<string, object>
+                {
+                    { "product", "SiteDeploy" }
+                }
+            };
+
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _dodoPaymentsApiKey);
+
+            var json = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var resp = await httpClient.PostAsync(apiUrl, content);
+            if (!resp.IsSuccessStatusCode)
+            {
+                var errText = await resp.Content.ReadAsStringAsync();
+                Serilog.Log.Error("Dodo create session fail: {Err}", errText);
+                return BadRequest("创建支付会话失败");
+            }
+
+            var respJson = await resp.Content.ReadFromJsonAsync<JsonElement>();
+            if (respJson.TryGetProperty("checkout_url", out var checkoutUrlEle))
+            {
+                return Ok(new { checkoutUrl = checkoutUrlEle.GetString() });
+            }
+            return BadRequest("未返回checkout_url");
+        }
+
 
         private static bool VerifyDodoPaymentsSignature(Dictionary<string, string> headers, byte[] rawBody, string? secret)
         {
