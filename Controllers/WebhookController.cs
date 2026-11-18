@@ -245,7 +245,8 @@ namespace SiteDeploy.Document.Controllers
                 metadata = new Dictionary<string, object>
                 {
                     { "product", "SiteDeploy" }
-                }
+                },
+                allowed_payment_method_types = new[] { "credit", "we_chat_pay", "ali_pay_hk" }
             };
 
             using var httpClient = new HttpClient();
