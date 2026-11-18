@@ -15,20 +15,23 @@ namespace SiteDeploy.Document.Controllers
     public class WebhookController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly IWebHostEnvironment _env;
         private readonly string? _lsWebhookSecret;
         private readonly string? _dodoPaymentsSecret;
         private readonly string? _dodoPaymentsApiKey;
-        private readonly IWebHostEnvironment _env;
+        private readonly string? _dodoPaymentsSiteDeployProductId;
         public WebhookController(AppDbContext dbContext, IConfiguration configuration, IWebHostEnvironment env)
         {
             _dbContext = dbContext;
+            _env = env;
             _lsWebhookSecret = Environment.GetEnvironmentVariable("LemonSqueezySecret");
             if (string.IsNullOrEmpty(_lsWebhookSecret)) _lsWebhookSecret = configuration["LemonSqueezySecret"]!;
             _dodoPaymentsSecret = Environment.GetEnvironmentVariable("DodoPaymentsSecret");
             if (string.IsNullOrEmpty(_dodoPaymentsSecret)) _dodoPaymentsSecret = configuration["DodoPaymentsSecret"]!;
             _dodoPaymentsApiKey = Environment.GetEnvironmentVariable("DodoPaymentsApiKey");
             if (string.IsNullOrEmpty(_dodoPaymentsApiKey)) _dodoPaymentsApiKey = configuration["DodoPaymentsApiKey"]!;
-            _env = env;
+            _dodoPaymentsSiteDeployProductId = Environment.GetEnvironmentVariable("DodoPaymentsSiteDeployProductId");
+            if (string.IsNullOrEmpty(_dodoPaymentsSiteDeployProductId)) _dodoPaymentsSiteDeployProductId = configuration["DodoPaymentsSiteDeployProductId"]!;
         }
         [HttpPost("lemonsqueezy")]
         public async Task<IActionResult> LemonSqueezy()
@@ -230,16 +233,12 @@ namespace SiteDeploy.Document.Controllers
         public async Task<IActionResult> CreateDodoSession()
         {
             bool isLive = _env.IsDevelopment() ? false : true;
-            string apiUrl = isLive
-                ? "https://live.dodopayments.com/checkouts"
-                : "https://test.dodopayments.com/checkouts";
-
-            string product_id = _env.IsDevelopment() ? "pdt_0Ns8DDS4JGU5Cub6l9shb" : "pdt_0NsCGAr6GwFgQRjUYPVf8";
+            string apiUrl = isLive ? "https://live.dodopayments.com/checkouts" : "https://test.dodopayments.com/checkouts";
             var requestBody = new
             {
                 product_cart = new List<object>
                 {
-                    new { product_id = product_id, quantity = 1 }
+                    new { product_id = _dodoPaymentsSiteDeployProductId, quantity = 1 }
                 },
                 success_redirect_url = "https://site-deploy-0lgd.onrender.com",
                 cancel_redirect_url = "https://site-deploy-0lgd.onrender.com",
